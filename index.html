@@ -137,8 +137,70 @@
         </div>
         <div class="section">
             <h2>📋 Individual Deck Reports</h2>
-            <p style="color: #888; text-align: center; padding: 20px;">No individual deck reports available yet.</p>
+            <div id="deck-reports-loading" style="color: #888; text-align: center; padding: 20px;">Loading deck reports...</div>
+            <table class="buylist-table" id="deck-reports-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Deck Name</th>
+                        <th>Date Priced</th>
+                        <th>Source</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="deck-reports-tbody">
+                </tbody>
+            </table>
+            <p id="deck-reports-empty" style="color: #888; text-align: center; padding: 20px; display: none;">No individual deck reports available yet.</p>
         </div>
     </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'https://komei.theworkpc.com';
+
+        // Load deck reports on page load
+        async function loadDeckReports() {
+            const loading = document.getElementById('deck-reports-loading');
+            const table = document.getElementById('deck-reports-table');
+            const empty = document.getElementById('deck-reports-empty');
+            const tbody = document.getElementById('deck-reports-tbody');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/decks/`);
+                if (!response.ok) throw new Error('Failed to fetch decks');
+                
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                
+                if (data.count === 0) {
+                    empty.style.display = 'block';
+                } else {
+                    tbody.innerHTML = data.items.map(deck => {
+                        const date = new Date(deck.generated_at);
+                        const formattedDate = date.toLocaleString();
+                        return `
+                            <tr>
+                                <td><a href="price.html?deck=${deck.id}" class="buylist-link">${deck.name}</a></td>
+                                <td>${formattedDate}</td>
+                                <td><span style="color: #4a90e2;">${deck.source?.toUpperCase() || 'MOXFIELD'}</span></td>
+                                <td>
+                                    <a href="${deck.url}" target="_blank" style="color: #67b5ff; text-decoration: none;" title="View on Moxfield">🔗</a>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                    table.style.display = 'table';
+                }
+            } catch (error) {
+                console.error('Error loading deck reports:', error);
+                loading.textContent = 'Error loading deck reports. Make sure the API is running.';
+                loading.style.color = '#ff6b6b';
+            }
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadDeckReports);
+    </script>
 </body>
 </html>

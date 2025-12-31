@@ -962,6 +962,37 @@
                 handlePriceDeck();
             }
         });
+
+        // Check for deck ID in URL parameters and load if present
+        async function loadDeckFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const deckId = urlParams.get('deck');
+            
+            if (deckId) {
+                showLoading('Loading deck...');
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/decks/${deckId}`);
+                    if (!response.ok) throw new Error('Deck not found');
+                    
+                    const data = await response.json();
+                    hideLoading();
+                    
+                    // Populate the URL field
+                    document.getElementById('deckUrl').value = data.url || '';
+                    
+                    // Display the results
+                    displayResults(data);
+                } catch (error) {
+                    hideLoading();
+                    showError(`Failed to load deck: ${error.message}`);
+                }
+            }
+        }
+
+        // Load deck on page load if URL parameter exists
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDeckFromUrl();
+        });
     </script>
 </body>
 </html>
