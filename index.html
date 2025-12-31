@@ -118,11 +118,31 @@
         .btn-refresh.refreshing {
             background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
         }
+        .btn-delete {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            margin-right: 5px;
+        }
+        .btn-delete:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.5);
+        }
+        .btn-delete:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
         @media (max-width: 768px) {
             .header h1 { font-size: 1.8em; }
             .deck-grid { grid-template-columns: 1fr; }
             .buylist-table { font-size: 0.9em; }
-            .btn-refresh { padding: 4px 8px; font-size: 0.8em; }
+            .btn-refresh, .btn-delete { padding: 4px 8px; font-size: 0.8em; }
         }
     </style>
 </head>
@@ -222,6 +242,9 @@
                                     <button class="btn-refresh" onclick="refreshDeck('${deck.id}', '${deck.url}')" title="Re-fetch and update prices">
                                         🔄 Update
                                     </button>
+                                    <button class="btn-delete" onclick="deleteDeck('${deck.id}', '${deck.name}')" title="Delete this deck report">
+                                        🗑️ Delete
+                                    </button>
                                     <a href="${deck.url}" target="_blank" style="color: #67b5ff; text-decoration: none;" title="View on Moxfield">🔗</a>
                                 </td>
                             </tr>
@@ -302,6 +325,56 @@
                     button.classList.remove('refreshing');
                     button.innerHTML = '🔄 Update';
                     button.style.background = '';
+                }, 3000);
+            }
+        }
+
+        // Delete a deck
+        async function deleteDeck(deckId, deckName) {
+            // Confirm deletion
+            if (!confirm(`Are you sure you want to delete "${deckName}"?\n\nThis will permanently remove the deck report and cannot be undone.`)) {
+                return;
+            }
+            
+            const button = event.target;
+            const row = document.getElementById(`deck-row-${deckId}`);
+            
+            // Disable button and show loading state
+            button.disabled = true;
+            button.innerHTML = '⏳ Deleting...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/decks/${deckId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || `API error: ${response.status}`);
+                }
+                
+                // Remove the row from the table with animation
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(() => {
+                    row.remove();
+                    
+                    // Check if table is empty
+                    const tbody = document.getElementById('deck-reports-tbody');
+                    if (tbody.children.length === 0) {
+                        document.getElementById('deck-reports-table').style.display = 'none';
+                        document.getElementById('deck-reports-empty').style.display = 'block';
+                    }
+                }, 300);
+                
+            } catch (error) {
+                console.error('Error deleting deck:', error);
+                button.innerHTML = '❌ Failed';
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = '🗑️ Delete';
                 }, 3000);
             }
         }
