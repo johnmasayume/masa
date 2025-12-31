@@ -1300,16 +1300,17 @@
                     
                     // Transform buylist data to deck format for display
                     const transformedData = {
-                        deckName: `Buy List #${buylistId} (${data.deck_ids.length} Decks)`,
+                        deckName: `Buy List #${buylistId} (${data.deck_count} Decks)`,
                         deckId: `buylist-${buylistId}`,
-                        totalCards: data.cards.length,
-                        cards: data.cards,
+                        totalCards: data.total_cards,
+                        cards: data.consolidated_cards,
                         totals: data.totals,
                         source: 'buylist',
                         metadata: {
-                            created_at: data.created_at,
-                            deck_count: data.deck_ids.length,
-                            deck_ids: data.deck_ids
+                            generated_at: data.generated_at,
+                            deck_count: data.deck_count,
+                            deck_ids: data.deck_ids,
+                            deck_names: data.deck_names
                         }
                     };
                     
