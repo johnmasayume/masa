@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTG Deck Pricer - Price Decks</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2944 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #4a90e2 0%, #67b5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p { font-size: 1.1em; color: #b0b0b0; }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            color: #4a90e2;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+        }
+        .nav-links a:hover { color: #67b5ff; }
+        .section {
+            background: #0f3460;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .backend-selector {
+            background: #1e3a5f;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .toggle-switch input[type="checkbox"] {
+            display: none;
+        }
+        .toggle-slider {
+            width: 50px;
+            height: 24px;
+            background: #555;
+            border-radius: 12px;
+            position: relative;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+        input[type="checkbox"]:checked + .toggle-slider {
+            background: #4caf50;
+        }
+        input[type="checkbox"]:checked + .toggle-slider::after {
+            left: 28px;
+        }
+        .backend-status {
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #333;
+        }
+        .backend-status.cli { color: #ffa500; }
+        .backend-status.api { color: #4caf50; }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a90e2;
+            font-weight: 600;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #2a5f8c;
+            border-radius: 8px;
+            background: #1a2f4a;
+            color: #e0e0e0;
+            font-size: 1em;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        .btn {
+            background: linear-gradient(135deg, #4a90e2 0%, #2a5f8c 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid #1e3a5f;
+            border-top: 4px solid #4a90e2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-note {
+            color: #b0b0b0;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        .error {
+            background: #5f1e1e;
+            border: 2px solid #8b2e2e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error.show { display: block; }
+        .results {
+            display: none;
+        }
+        .results.show { display: block; }
+        .deck-header {
+            background: #1e3a5f;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .deck-name {
+            font-size: 1.8em;
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .total-card {
+            background: #1e3a5f;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .total-card h3 {
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        .price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #67b5ff;
+        }
+        .price-usd {
+            color: #b0b0b0;
+            margin-top: 5px;
+        }
+        .cards-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .cards-table th {
+            background: #1e3a5f;
+            color: #67b5ff;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .cards-table td {
+            padding: 12px;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .cards-table tr:hover {
+            background: #1a2f4a;
+        }
+        .out-of-stock {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        .source-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .source-badge.api {
+            background: #4caf50;
+            color: white;
+        }
+        .source-badge.cli {
+            background: #ffa500;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🃏 MTG Deck Pricer</h1>
+            <p>Price your Magic: The Gathering decks from Moxfield</p>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">← Back to Hub</a>
+        </div>
+
+        <div class="section">
+            <div class="backend-selector">
+                <label class="toggle-switch">
+                    <span style="margin-right: 10px;">Backend Mode:</span>
+                    <input type="checkbox" id="useApiToggle">
+                    <span class="toggle-slider"></span>
+                    <span style="margin-left: 10px;">Use API Backend (Beta)</span>
+                </label>
+                <span class="backend-status cli" id="backendStatus">CLI Mode</span>
+            </div>
+
+            <div class="input-group">
+                <label for="deckUrl">Moxfield Deck URL</label>
+                <input 
+                    type="text" 
+                    id="deckUrl" 
+                    placeholder="https://moxfield.com/decks/..."
+                >
+            </div>
+
+            <button class="btn" id="priceBtn" onclick="handlePriceDeck()">
+                Price Deck
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p id="loadingMessage">Pricing deck...</p>
+                <p class="loading-note">This usually takes 30-60 seconds</p>
+            </div>
+
+            <div class="error" id="error">
+                <strong>Error:</strong> <span id="errorMessage"></span>
+                <br>
+                <small>Try switching backend mode or check the deck URL.</small>
+            </div>
+        </div>
+
+        <div class="section results" id="results">
+            <div class="deck-header">
+                <h2 class="deck-name" id="deckName"></h2>
+                <p>Total Cards: <strong id="totalCards"></strong></p>
+                <p>Source: <span class="source-badge" id="sourceBadge"></span></p>
+            </div>
+
+            <div class="totals-grid">
+                <div class="total-card">
+                    <h3>Hareruya (Japan)</h3>
+                    <p class="price">¥<span id="hareruyaJpy">0</span></p>
+                    <p class="price-usd">$<span id="hareruyaUsd">0.00</span></p>
+                </div>
+                <div class="total-card">
+                    <h3>Card Kingdom (US)</h3>
+                    <p class="price">$<span id="cardKingdomUsd">0.00</span></p>
+                </div>
+            </div>
+
+            <table class="cards-table">
+                <thead>
+                    <tr>
+                        <th>Card Name</th>
+                        <th>Qty</th>
+                        <th>Hareruya (¥)</th>
+                        <th>Hareruya ($)</th>
+                        <th>Card Kingdom ($)</th>
+                        <th>Language</th>
+                        <th>Condition</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody id="cardsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            API_BASE_URL: 'http://komei.theworkpc.com:1288',
+            STORAGE_KEY: 'hareruya_use_api'
+        };
+
+        // Initialize toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('useApiToggle');
+            const status = document.getElementById('backendStatus');
+            
+            // Load saved preference
+            const useApi = localStorage.getItem(CONFIG.STORAGE_KEY) === 'true';
+            toggle.checked = useApi;
+            updateStatus(useApi);
+            
+            // Handle toggle
+            toggle.addEventListener('change', (e) => {
+                const useApi = e.target.checked;
+                localStorage.setItem(CONFIG.STORAGE_KEY, useApi);
+                updateStatus(useApi);
+            });
+            
+            function updateStatus(useApi) {
+                status.textContent = useApi ? 'API Mode' : 'CLI Mode';
+                status.className = useApi ? 'backend-status api' : 'backend-status cli';
+                
+                const badge = document.getElementById('sourceBadge');
+                if (badge) {
+                    badge.className = useApi ? 'source-badge api' : 'source-badge cli';
+                }
+            }
+        });
+
+        // Show/hide elements
+        function showLoading(message = 'Pricing deck...') {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loadingMessage').textContent = message;
+            document.getElementById('priceBtn').disabled = true;
+            hideError();
+            hideResults();
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('priceBtn').disabled = false;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            document.getElementById('errorMessage').textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('error').classList.remove('show');
+        }
+
+        function showResults() {
+            document.getElementById('results').classList.add('show');
+        }
+
+        function hideResults() {
+            document.getElementById('results').classList.remove('show');
+        }
+
+        // Main handler
+        async function handlePriceDeck() {
+            const deckUrl = document.getElementById('deckUrl').value.trim();
+            
+            if (!deckUrl) {
+                showError('Please enter a Moxfield deck URL');
+                return;
+            }
+
+            if (!deckUrl.includes('moxfield.com')) {
+                showError('Please enter a valid Moxfield deck URL');
+                return;
+            }
+
+            showLoading('Fetching deck from Moxfield...');
+            
+            try {
+                const result = await priceDeck(deckUrl);
+                hideLoading();
+                displayResults(result);
+            } catch (error) {
+                hideLoading();
+                showError(error.message);
+                console.error('Error pricing deck:', error);
+            }
+        }
+
+        // Dual-mode pricing function
+        async function priceDeck(deckUrl) {
+            const useApi = localStorage.getItem(CONFIG.STORAGE_KEY) === 'true';
+            
+            if (useApi) {
+                return await priceDeckViaAPI(deckUrl);
+            } else {
+                return await priceDeckViaCLI(deckUrl);
+            }
+        }
+
+        // Price via FastAPI backend
+        async function priceDeckViaAPI(deckUrl) {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/decks/moxfield`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        deck_url: deckUrl
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || `API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Transform to common format
+                return {
+                    deckName: data.name,
+                    deckId: data.deck_id,
+                    totalCards: data.cards.length,
+                    cards: data.cards,
+                    totals: data.totals,
+                    source: 'api'
+                };
+                
+            } catch (error) {
+                console.error('API error:', error);
+                throw new Error(`Failed to price deck via API: ${error.message}`);
+            }
+        }
+
+        // Price via CLI (Python backend)
+        async function priceDeckViaCLI(deckUrl) {
+            // TODO: Implement CLI mode
+            // This would call your existing Python backend
+            throw new Error('CLI mode not yet implemented in frontend. Please use API mode or run Python scripts directly.');
+        }
+
+        // Display results
+        function displayResults(data) {
+            // Update header
+            document.getElementById('deckName').textContent = data.deckName;
+            document.getElementById('totalCards').textContent = data.totalCards;
+            
+            const badge = document.getElementById('sourceBadge');
+            badge.textContent = data.source.toUpperCase();
+            badge.className = `source-badge ${data.source}`;
+            
+            // Update totals
+            document.getElementById('hareruyaJpy').textContent = data.totals.hareruya_jpy.toLocaleString();
+            document.getElementById('hareruyaUsd').textContent = (data.totals.hareruya_usd || 0).toFixed(2);
+            document.getElementById('cardKingdomUsd').textContent = (data.totals.cardkingdom_usd || 0).toFixed(2);
+            
+            // Update cards table
+            const tbody = document.getElementById('cardsTableBody');
+            tbody.innerHTML = data.cards.map(card => {
+                const isOutOfStock = card.hareruya_note === 'OUT OF STOCK';
+                return `
+                    <tr>
+                        <td>${card.name}</td>
+                        <td>${card.quantity}</td>
+                        <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
+                            ${card.hareruya_price_jpy ? '¥' + card.hareruya_price_jpy : 'N/A'}
+                        </td>
+                        <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
+                            ${card.hareruya_price_usd ? '$' + card.hareruya_price_usd.toFixed(2) : 'N/A'}
+                        </td>
+                        <td>${card.cardkingdom_price_usd ? '$' + card.cardkingdom_price_usd.toFixed(2) : 'N/A'}</td>
+                        <td>${card.hareruya_language || '-'}</td>
+                        <td>${card.hareruya_condition || '-'}</td>
+                        <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
+                            ${card.hareruya_note || '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            showResults();
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('deckUrl').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handlePriceDeck();
+            }
+        });
+    </script>
+</body>
+</html>
