@@ -953,7 +953,7 @@
             
             // Update header
             document.getElementById('deckName').textContent = data.name || data.deckName;
-            document.getElementById('totalCards').textContent = data.cards.length;
+            document.getElementById('totalCards').textContent = data.totalCards || data.cards.length;
             
             const badge = document.getElementById('sourceBadge');
             
@@ -975,6 +975,12 @@
             document.getElementById('hareruyaJpy').textContent = data.totals.hareruya_jpy.toLocaleString();
             document.getElementById('hareruyaUsd').textContent = (data.totals.hareruya_usd || 0).toFixed(2);
             document.getElementById('cardKingdomUsd').textContent = (data.totals.cardkingdom_usd || 0).toFixed(2);
+            
+            // Ensure cards array exists
+            if (!data.cards || !Array.isArray(data.cards)) {
+                showError('Invalid deck data: no cards found');
+                return;
+            }
             
             // Fetch card metadata from Scryfall
             showLoading('Fetching card details...');
@@ -1296,6 +1302,7 @@
                     if (!response.ok) throw new Error('Buy list not found');
                     
                     const data = await response.json();
+                    console.log('Buylist API response:', data);
                     hideLoading();
                     
                     // Transform buylist data to deck format for display
@@ -1314,9 +1321,12 @@
                         }
                     };
                     
+                    console.log('Transformed buylist data:', transformedData);
+                    
                     // Display the results
                     displayResults(transformedData);
                 } catch (error) {
+                    console.error('Buylist loading error:', error);
                     hideLoading();
                     showError(`Failed to load buy list: ${error.message}`);
                 }
