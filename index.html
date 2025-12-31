@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTG Deck Price Hub</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
@@ -13,7 +18,12 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
         .header {
             text-align: center;
             padding: 40px 20px;
@@ -22,6 +32,7 @@
             margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
+        
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
@@ -30,7 +41,12 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .header p { font-size: 1.1em; color: #b0b0b0; }
+        
+        .header p {
+            font-size: 1.1em;
+            color: #b0b0b0;
+        }
+        
         .section {
             background: #0f3460;
             padding: 25px;
@@ -38,6 +54,7 @@
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
+        
         .section h2 {
             color: #4a90e2;
             margin-bottom: 20px;
@@ -45,11 +62,13 @@
             border-bottom: 2px solid #2a5f8c;
             padding-bottom: 10px;
         }
+        
         .buylist-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
         }
+        
         .buylist-table th {
             background: #1e3a5f;
             color: #67b5ff;
@@ -57,25 +76,33 @@
             text-align: left;
             font-weight: 600;
         }
+        
         .buylist-table td {
             padding: 12px;
             border-bottom: 1px solid #1e3a5f;
         }
-        .buylist-table tr:hover { background: #1a2f4a; }
+        
+        .buylist-table tr:hover {
+            background: #1a2f4a;
+        }
+        
         .buylist-link {
             color: #4a90e2;
             text-decoration: none;
             font-weight: 600;
         }
+        
         .buylist-link:hover {
             color: #67b5ff;
             text-decoration: underline;
         }
+        
         .deck-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 15px;
         }
+        
         .deck-card {
             background: linear-gradient(135deg, #1e5f8c 0%, #0f3460 100%);
             padding: 20px;
@@ -85,64 +112,31 @@
             transition: transform 0.2s, box-shadow 0.2s;
             border: 1px solid #2a6fa8;
         }
+        
         .deck-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(30, 95, 140, 0.5);
         }
+        
         .deck-name {
             font-size: 1.2em;
             font-weight: bold;
             color: #4a90e2;
             margin-bottom: 5px;
         }
-        .btn-refresh {
-            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.2s;
-            margin-right: 5px;
-        }
-        .btn-refresh:hover {
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
-        }
-        .btn-refresh:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .btn-refresh.refreshing {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-        }
-        .btn-delete {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.2s;
-            margin-right: 5px;
-        }
-        .btn-delete:hover {
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.5);
-        }
-        .btn-delete:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
+        
         @media (max-width: 768px) {
-            .header h1 { font-size: 1.8em; }
-            .deck-grid { grid-template-columns: 1fr; }
-            .buylist-table { font-size: 0.9em; }
-            .btn-refresh, .btn-delete { padding: 4px 8px; font-size: 0.8em; }
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .deck-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buylist-table {
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
@@ -151,15 +145,6 @@
         <div class="header">
             <h1>🃏 MTG Deck Price Hub</h1>
             <p>Browse your deck pricing reports and consolidated buy lists</p>
-        </div>
-        
-        <div class="section">
-            <h2>🎯 Quick Actions</h2>
-            <div style="text-align: center; padding: 20px;">
-                <a href="price.html" style="display: inline-block; background: linear-gradient(135deg, #4a90e2 0%, #2a5f8c 100%); color: white; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1em;">
-                    💰 Price a New Deck
-                </a>
-            </div>
         </div>
         
         <div class="section">
@@ -179,208 +164,15 @@
                 </tbody>
             </table>
         </div>
+        
         <div class="section">
             <h2>📋 Individual Deck Reports</h2>
-            <div id="deck-reports-loading" style="color: #888; text-align: center; padding: 20px;">Loading deck reports...</div>
-            <table class="buylist-table" id="deck-reports-table" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Deck Name</th>
-                        <th>Date Priced</th>
-                        <th>Source</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="deck-reports-tbody">
-                </tbody>
-            </table>
-            <p id="deck-reports-empty" style="color: #888; text-align: center; padding: 20px; display: none;">No individual deck reports available yet.</p>
+            <div class="deck-grid">
+                <a href="decks/moxfield_100_Green_Goblin.html" class="deck-card">
+                    <div class="deck-name">100 Green Goblin</div>
+                </a>
+            </div>
         </div>
     </div>
-
-    <script>
-        // Configuration
-        const API_BASE_URL = 'https://komei.theworkpc.com';
-
-        // Load deck reports on page load
-        async function loadDeckReports() {
-            const loading = document.getElementById('deck-reports-loading');
-            const table = document.getElementById('deck-reports-table');
-            const empty = document.getElementById('deck-reports-empty');
-            const tbody = document.getElementById('deck-reports-tbody');
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/decks/`);
-                if (!response.ok) throw new Error('Failed to fetch decks');
-                
-                const data = await response.json();
-                
-                loading.style.display = 'none';
-                
-                if (data.count === 0) {
-                    empty.style.display = 'block';
-                } else {
-                    tbody.innerHTML = data.items.map(deck => {
-                        // Backend sends UTC time without 'Z', so append it for proper parsing
-                        const utcString = deck.generated_at.endsWith('Z') ? deck.generated_at : deck.generated_at + 'Z';
-                        const date = new Date(utcString);
-                        // ISO style: YYYY-MM-DD HH:MM with timezone
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                        const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
-                        const fullDate = `${formattedDate} (${timezone})`;
-                        return `
-                            <tr id="deck-row-${deck.id}">
-                                <td><a href="price.html?deck=${deck.id}" class="buylist-link">${deck.name}</a></td>
-                                <td title="${fullDate}">${formattedDate}</td>
-                                <td><span style="color: #4a90e2;">${deck.source?.toUpperCase() || 'MOXFIELD'}</span></td>
-                                <td>
-                                    <button class="btn-refresh" onclick="refreshDeck('${deck.id}', '${deck.url}')" title="Re-fetch and update prices">
-                                        🔄 Update
-                                    </button>
-                                    <button class="btn-delete" onclick="deleteDeck('${deck.id}', '${deck.name}')" title="Delete this deck report">
-                                        🗑️ Delete
-                                    </button>
-                                    <a href="${deck.url}" target="_blank" style="color: #67b5ff; text-decoration: none;" title="View on Moxfield">🔗</a>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                    table.style.display = 'table';
-                }
-            } catch (error) {
-                console.error('Error loading deck reports:', error);
-                loading.textContent = 'Error loading deck reports. Make sure the API is running.';
-                loading.style.color = '#ff6b6b';
-            }
-        }
-
-        // Refresh/update a deck from Moxfield
-        async function refreshDeck(deckId, deckUrl) {
-            const button = event.target;
-            const row = document.getElementById(`deck-row-${deckId}`);
-            
-            // Disable button and show loading state
-            button.disabled = true;
-            button.classList.add('refreshing');
-            button.innerHTML = '⏳ Updating...';
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/decks/moxfield`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        deck_url: deckUrl
-                    })
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.detail || `API error: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Update the date in the row
-                const dateCell = row.cells[1];
-                // Backend sends UTC time without 'Z', so append it for proper parsing
-                const utcString = data.generated_at.endsWith('Z') ? data.generated_at : data.generated_at + 'Z';
-                const newDate = new Date(utcString);
-                const year = newDate.getFullYear();
-                const month = String(newDate.getMonth() + 1).padStart(2, '0');
-                const day = String(newDate.getDate()).padStart(2, '0');
-                const hours = String(newDate.getHours()).padStart(2, '0');
-                const minutes = String(newDate.getMinutes()).padStart(2, '0');
-                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
-                dateCell.textContent = formattedDate;
-                dateCell.title = `${formattedDate} (${timezone})`;
-                
-                // Show success feedback
-                button.innerHTML = '✓ Updated!';
-                button.style.background = 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)';
-                
-                // Reset button after 2 seconds
-                setTimeout(() => {
-                    button.disabled = false;
-                    button.classList.remove('refreshing');
-                    button.innerHTML = '🔄 Update';
-                    button.style.background = '';
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Error refreshing deck:', error);
-                button.innerHTML = '❌ Failed';
-                button.style.background = 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)';
-                
-                // Reset button after 3 seconds
-                setTimeout(() => {
-                    button.disabled = false;
-                    button.classList.remove('refreshing');
-                    button.innerHTML = '🔄 Update';
-                    button.style.background = '';
-                }, 3000);
-            }
-        }
-
-        // Delete a deck
-        async function deleteDeck(deckId, deckName) {
-            // Confirm deletion
-            if (!confirm(`Are you sure you want to delete "${deckName}"?\n\nThis will permanently remove the deck report and cannot be undone.`)) {
-                return;
-            }
-            
-            const button = event.target;
-            const row = document.getElementById(`deck-row-${deckId}`);
-            
-            // Disable button and show loading state
-            button.disabled = true;
-            button.innerHTML = '⏳ Deleting...';
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/decks/${deckId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.detail || `API error: ${response.status}`);
-                }
-                
-                // Remove the row from the table with animation
-                row.style.transition = 'opacity 0.3s';
-                row.style.opacity = '0';
-                setTimeout(() => {
-                    row.remove();
-                    
-                    // Check if table is empty
-                    const tbody = document.getElementById('deck-reports-tbody');
-                    if (tbody.children.length === 0) {
-                        document.getElementById('deck-reports-table').style.display = 'none';
-                        document.getElementById('deck-reports-empty').style.display = 'block';
-                    }
-                }, 300);
-                
-            } catch (error) {
-                console.error('Error deleting deck:', error);
-                button.innerHTML = '❌ Failed';
-                
-                // Reset button after 3 seconds
-                setTimeout(() => {
-                    button.disabled = false;
-                    button.innerHTML = '🗑️ Delete';
-                }, 3000);
-            }
-        }
-
-        // Load on page load
-        document.addEventListener('DOMContentLoaded', loadDeckReports);
-    </script>
 </body>
 </html>
