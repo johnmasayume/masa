@@ -600,6 +600,43 @@
             color: #ff6b6b;
         }
         
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .back-to-top:active {
+            transform: translateY(-2px);
+        }
+        
         @media (max-width: 768px) {
             .modal {
                 padding: 10px;
@@ -765,6 +802,9 @@
             </table>
         </div>
     </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTopBtn" class="back-to-top" title="Back to top">↑</button>
 
     <!-- Card Details Modal -->
     <div id="card-modal" class="modal">
@@ -1355,6 +1395,26 @@
         // Load deck on page load if URL parameter exists
         document.addEventListener('DOMContentLoaded', () => {
             loadDeckFromUrl();
+            
+            // Back to top button functionality
+            const backToTopBtn = document.getElementById('backToTopBtn');
+            
+            // Show/hide button on scroll
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
+            
+            // Scroll to top on click
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
 </body>
