@@ -307,13 +307,39 @@
             font-size: 0.9em;
             font-weight: 600;
         }
-        .filter-group select {
+        .filter-group select, .filter-group input {
             padding: 8px 12px;
             border-radius: 5px;
             background: #0f3460;
             color: #e0e0e0;
             border: 1px solid #4a90e2;
             cursor: pointer;
+        }
+        .filter-group input {
+            min-width: 200px;
+            cursor: text;
+        }
+        .filter-group input::placeholder {
+            color: #6a8099;
+        }
+        .search-clear {
+            position: relative;
+        }
+        .search-clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #4a90e2;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 5px;
+            display: none;
+        }
+        .search-clear-btn:hover {
+            color: #67b5ff;
         }
         .mana-cost {
             display: inline-flex;
@@ -648,6 +674,12 @@
             </div>
 
             <div class="filter-controls" id="filterControls" style="display: none;">
+                <div class="filter-group search-clear">
+                    <label>🔍 Search Cards</label>
+                    <input type="text" id="searchInput" placeholder="Type to search..." 
+                           oninput="applyFilters()" autocomplete="off">
+                    <button class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()" title="Clear search">×</button>
+                </div>
                 <div class="filter-group">
                     <label>Card Type</label>
                     <select id="typeFilter" onchange="applyFilters()">
@@ -686,6 +718,8 @@
                     </select>
                 </div>
             </div>
+            
+            <div id="resultsCount" style="color: #b0b0b0; margin-bottom: 10px; display: none;"></div>
             
             <table class="cards-table">
                 <thead>
@@ -967,16 +1001,39 @@
         
         // Apply filters and sorting
         function applyFilters() {
+            // Show/hide clear button
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('searchClearBtn');
+            if (clearBtn) {
+                clearBtn.style.display = searchInput.value ? 'block' : 'none';
+            }
+            
             renderCards();
+        }
+        
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchClearBtn').style.display = 'none';
+            applyFilters();
         }
         
         // Render cards with current filters
         function renderCards() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
             const typeFilter = document.getElementById('typeFilter').value;
             const sortFilter = document.getElementById('sortFilter').value;
             const colorFilter = document.getElementById('colorFilter').value;
             
             let filtered = [...cardsData];
+            
+            // Search filter
+            if (searchQuery) {
+                filtered = filtered.filter(card => 
+                    card.name.toLowerCase().includes(searchQuery) ||
+                    (card.metadata.type_line && card.metadata.type_line.toLowerCase().includes(searchQuery))
+                );
+            }
             
             // Filter by type
             if (typeFilter !== 'all') {
@@ -1050,6 +1107,17 @@
                     </tr>
                 `;
             }).join('');
+            
+            // Update results count
+            const resultsCount = document.getElementById('resultsCount');
+            if (resultsCount) {
+                if (filtered.length !== cardsData.length) {
+                    resultsCount.textContent = `Showing ${filtered.length} of ${cardsData.length} cards`;
+                    resultsCount.style.display = 'block';
+                } else {
+                    resultsCount.style.display = 'none';
+                }
+            }
         }
 
         // Card Modal Functions
