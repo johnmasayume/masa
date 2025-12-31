@@ -49,8 +49,14 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+        }        
+        /* Table container for overflow handling */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        .buylist-table th {
+                .buylist-table th {
             background: #1e3a5f;
             color: #67b5ff;
             padding: 12px;
@@ -319,24 +325,37 @@
                 font-size: 0.9em;
             }
             
-            /* Tables - make them horizontally scrollable */
-            .buylist-table {
-                font-size: 0.85em;
-                min-width: 700px; /* Force horizontal scroll for narrow screens */
+            /* Table container for horizontal scrolling */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                margin: 0 -10px; /* Extend to container edges */
+                padding: 0 10px;
+                display: block; /* Ensure block layout */
             }
             
-            /* Wrap tables in scrollable container */
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
+            /* Tables - make them horizontally scrollable */
+            .buylist-table {
+                font-size: 0.8em;
+                min-width: 650px; /* Force horizontal scroll for narrow screens */
+                width: 100%;
+                display: table; /* Keep table display */
             }
             
             /* Table cells */
             .buylist-table th,
             .buylist-table td {
-                padding: 8px 6px;
+                padding: 6px 4px;
                 font-size: 0.9em;
+                white-space: nowrap; /* Prevent text wrapping */
+            }
+            
+            /* First column can wrap */
+            .buylist-table th:first-child,
+            .buylist-table td:first-child {
+                white-space: normal;
+                min-width: 100px;
+                max-width: 150px;
             }
             
             /* Action buttons */
@@ -417,36 +436,40 @@
                 </button>
             </div>
             <div id="buylists-loading" style="color: #888; text-align: center; padding: 20px;">Loading buy lists...</div>
-            <table class="buylist-table" id="buylists-table" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Buy List</th>
-                        <th>Decks</th>
-                        <th>Total Cards</th>
-                        <th>Date Generated</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="buylists-tbody">
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table class="buylist-table" id="buylists-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Buy List</th>
+                            <th>Decks</th>
+                            <th>Total Cards</th>
+                            <th>Date Generated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="buylists-tbody">
+                    </tbody>
+                </table>
+            </div>
             <p id="buylists-empty" style="color: #888; text-align: center; padding: 20px; display: none;">No buy lists yet. Create one from your priced decks!</p>
         </div>
         <div class="section">
             <h2>📋 Individual Deck Reports</h2>
             <div id="deck-reports-loading" style="color: #888; text-align: center; padding: 20px;">Loading deck reports...</div>
-            <table class="buylist-table" id="deck-reports-table" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Deck Name</th>
-                        <th>Date Priced</th>
-                        <th>Source</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="deck-reports-tbody">
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table class="buylist-table" id="deck-reports-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Deck Name</th>
+                            <th>Date Priced</th>
+                            <th>Source</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deck-reports-tbody">
+                    </tbody>
+                </table>
+            </div>
             <p id="deck-reports-empty" style="color: #888; text-align: center; padding: 20px; display: none;">No individual deck reports available yet.</p>
         </div>
     </div>
