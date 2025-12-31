@@ -258,6 +258,12 @@
         }
         .card-name {
             font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .card-name:hover {
+            color: #00d4ff;
         }
         .out-of-stock {
             color: #ff6b6b;
@@ -278,6 +284,183 @@
         .source-badge.cli {
             background: #ffa500;
             color: white;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: #0f1a2a;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            max-width: 1200px;
+            width: 90%;
+            margin: 20px;
+            position: relative;
+            border: 2px solid #1e3a5f;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f3460 100%);
+            padding: 20px;
+            border-bottom: 2px solid #00d4ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-header h2 {
+            color: #00d4ff;
+            margin: 0;
+            font-size: 1.8em;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #00d4ff;
+            font-size: 2em;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+        
+        .modal-close:hover {
+            transform: scale(1.2);
+            color: #fff;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .modal-main-card {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .modal-card-image {
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-oracle {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .modal-type {
+            color: #b0b0b0;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .modal-text {
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            background: #0a1929;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00d4ff;
+        }
+        
+        .modal-flavor {
+            color: #9ca3af;
+            font-style: italic;
+            margin-top: 15px;
+            padding: 10px;
+            background: #16213e;
+            border-radius: 8px;
+        }
+        
+        .modal-printings {
+            border-top: 2px solid #1e3a5f;
+            padding-top: 30px;
+        }
+        
+        .modal-printings h3 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        
+        .printings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .printing-item {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .printing-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .printing-image {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.2s;
+        }
+        
+        .printing-image:hover {
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.5);
+        }
+        
+        .printing-set {
+            color: #b0b0b0;
+            font-size: 0.8em;
+            margin-top: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .loading, .modal-error {
+            text-align: center;
+            padding: 40px;
+            color: #00d4ff;
+            font-size: 1.2em;
+        }
+        
+        .modal-error {
+            color: #ff6b6b;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-main-card {
+                flex-direction: column;
+            }
+            
+            .modal-card-image {
+                max-width: 100%;
+            }
+            
+            .printings-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
         }
     </style>
 </head>
@@ -362,6 +545,13 @@
                 <tbody id="cardsTableBody">
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Card Details Modal -->
+    <div id="card-modal" class="modal">
+        <div class="modal-content" id="modal-card-content">
+            <!-- Dynamic content will be inserted here -->
         </div>
     </div>
 
@@ -568,8 +758,10 @@
                     <tr>
                         <td>
                             <div class="card-cell">
-                                <img class="card-image loading" id="cardImg${index}" alt="${card.name}">
-                                <span class="card-name">${card.name}</span>
+                                <img class="card-image loading" id="cardImg${index}" alt="${card.name}" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')"
+                                     style="cursor: pointer;" title="Click for details">
+                                <span class="card-name" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')"
+                                      title="Click for details">${card.name}</span>
                             </div>
                         </td>
                         <td>${card.quantity}</td>
@@ -601,6 +793,118 @@
             
             // Scroll to results
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Card Modal Functions
+        async function showCardModal(cardName) {
+            const modal = document.getElementById('card-modal');
+            const modalContent = document.getElementById('modal-card-content');
+            
+            modal.style.display = 'flex';
+            modalContent.innerHTML = '<div class="loading">Loading card details...</div>';
+            
+            try {
+                // Fetch card data from Scryfall
+                const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`);
+                const card = await response.json();
+                
+                // Fetch all printings
+                const printsResponse = await fetch(card.prints_search_uri);
+                const printsData = await printsResponse.json();
+                
+                // Build modal content
+                let html = '<div class="modal-header">';
+                html += `<h2>${card.name}</h2>`;
+                html += '<button class="modal-close" onclick="closeCardModal()">&times;</button>';
+                html += '</div>';
+                
+                html += '<div class="modal-body">';
+                
+                // Main card image
+                html += '<div class="modal-main-card">';
+                const mainImage = card.image_uris ? card.image_uris.large : 
+                                 (card.card_faces && card.card_faces[0].image_uris ? card.card_faces[0].image_uris.large : '');
+                html += `<img src="${mainImage}" alt="${card.name}" class="modal-card-image" id="main-card-image">`;
+                
+                // Oracle text
+                html += '<div class="modal-oracle">';
+                html += `<div class="modal-type"><strong>Type:</strong> ${card.type_line}</div>`;
+                
+                // Mana cost
+                if (card.mana_cost) {
+                    html += `<div class="modal-type"><strong>Mana Cost:</strong> ${card.mana_cost}</div>`;
+                }
+                
+                // Power/Toughness for creatures
+                if (card.power && card.toughness) {
+                    html += `<div class="modal-type"><strong>P/T:</strong> ${card.power}/${card.toughness}</div>`;
+                }
+                
+                // Loyalty for planeswalkers
+                if (card.loyalty) {
+                    html += `<div class="modal-type"><strong>Loyalty:</strong> ${card.loyalty}</div>`;
+                }
+                
+                let oracleText = card.oracle_text || '';
+                if (card.card_faces && !oracleText) {
+                    oracleText = card.card_faces.map(face => `<strong>${face.name}:</strong>\\n${face.oracle_text}`).join('\\n\\n');
+                }
+                html += `<div class="modal-text"><strong>Oracle Text:</strong><br>${oracleText.replace(/\\n/g, '<br>')}</div>`;
+                
+                if (card.flavor_text) {
+                    html += `<div class="modal-flavor"><em>${card.flavor_text}</em></div>`;
+                }
+                html += '</div>';
+                html += '</div>';
+                
+                // Different printings
+                if (printsData.data && printsData.data.length > 1) {
+                    html += '<div class="modal-printings">';
+                    html += `<h3>Other Printings (${printsData.data.length} versions)</h3>`;
+                    html += '<div class="printings-grid">';
+                    
+                    // Show up to 20 printings
+                    for (let i = 0; i < Math.min(printsData.data.length, 20); i++) {
+                        const print = printsData.data[i];
+                        const printImage = print.image_uris ? print.image_uris.small : 
+                                         (print.card_faces && print.card_faces[0].image_uris ? print.card_faces[0].image_uris.small : '');
+                        if (printImage) {
+                            html += '<div class="printing-item">';
+                            html += `<img src="${printImage}" alt="${print.set_name}" class="printing-image" onclick="swapMainImage('${printImage.replace('small', 'large')}')" title="Click to view this version">`;
+                            html += `<div class="printing-set">${print.set_name.toUpperCase()} (${print.released_at.substring(0, 4)})</div>`;
+                            html += '</div>';
+                        }
+                    }
+                    
+                    html += '</div>';
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                
+                modalContent.innerHTML = html;
+            } catch (error) {
+                modalContent.innerHTML = `<div class="modal-error">Error loading card details: ${error.message}</div>`;
+            }
+        }
+
+        function closeCardModal() {
+            document.getElementById('card-modal').style.display = 'none';
+        }
+
+        function swapMainImage(imageUrl) {
+            const mainImage = document.getElementById('main-card-image');
+            if (mainImage) {
+                mainImage.src = imageUrl;
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('card-modal');
+            if (event.target === modal) {
+                closeCardModal();
+            }
         }
 
         // Allow Enter key to submit
