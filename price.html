@@ -346,7 +346,9 @@
     <script>
         // Configuration
         const CONFIG = {
-            API_BASE_URL: 'https://komei.theworkpc.com',
+            API_BASE_URL: window.location.protocol === 'https:' 
+                ? 'https://komei.theworkpc.com'  // HTTPS endpoint (when Caddy is set up)
+                : 'http://komei.theworkpc.com:1288',  // Fallback to HTTP
             STORAGE_KEY: 'hareruya_use_api'
         };
 
