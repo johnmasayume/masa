@@ -202,11 +202,19 @@
                 } else {
                     tbody.innerHTML = data.items.map(deck => {
                         const date = new Date(deck.generated_at);
-                        const formattedDate = date.toLocaleString();
+                        // ISO style: YYYY-MM-DD HH:MM with timezone
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+                        const fullDate = `${formattedDate} (${timezone})`;
                         return `
                             <tr id="deck-row-${deck.id}">
                                 <td><a href="price.html?deck=${deck.id}" class="buylist-link">${deck.name}</a></td>
-                                <td>${formattedDate}</td>
+                                <td title="${fullDate}">${formattedDate}</td>
                                 <td><span style="color: #4a90e2;">${deck.source?.toUpperCase() || 'MOXFIELD'}</span></td>
                                 <td>
                                     <button class="btn-refresh" onclick="refreshDeck('${deck.id}', '${deck.url}')" title="Re-fetch and update prices">
@@ -257,7 +265,15 @@
                 // Update the date in the row
                 const dateCell = row.cells[1];
                 const newDate = new Date(data.generated_at);
-                dateCell.textContent = newDate.toLocaleString();
+                const year = newDate.getFullYear();
+                const month = String(newDate.getMonth() + 1).padStart(2, '0');
+                const day = String(newDate.getDate()).padStart(2, '0');
+                const hours = String(newDate.getHours()).padStart(2, '0');
+                const minutes = String(newDate.getMinutes()).padStart(2, '0');
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+                dateCell.textContent = formattedDate;
+                dateCell.title = `${formattedDate} (${timezone})`;
                 
                 // Show success feedback
                 button.innerHTML = '✓ Updated!';
