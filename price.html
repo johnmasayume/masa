@@ -235,6 +235,30 @@
         .cards-table tr:hover {
             background: #1a2f4a;
         }
+        .card-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-image {
+            width: 40px;
+            height: 56px;
+            border-radius: 4px;
+            object-fit: cover;
+            border: 1px solid #4a90e2;
+        }
+        .card-image.loading {
+            background: linear-gradient(90deg, #1a2f4a 0%, #2a4f7a 50%, #1a2f4a 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .card-name {
+            font-weight: 500;
+        }
         .out-of-stock {
             color: #ff6b6b;
             font-weight: bold;
@@ -327,14 +351,12 @@
             <table class="cards-table">
                 <thead>
                     <tr>
-                        <th>Card Name</th>
+                        <th>Card</th>
                         <th>Qty</th>
                         <th>Hareruya (¥)</th>
                         <th>Hareruya ($)</th>
                         <th>Card Kingdom ($)</th>
-                        <th>Language</th>
-                        <th>Condition</th>
-                        <th>Note</th>
+                        <th>Stock</th>
                     </tr>
                 </thead>
                 <tbody id="cardsTableBody">
@@ -499,15 +521,29 @@
             throw new Error('CLI mode not yet implemented in frontend. Please use API mode or run Python scripts directly.');
         }
 
+        // Fetch card image from Scryfall
+        async function getCardImage(cardName) {
+            try {
+                const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.image_uris?.small || data.card_faces?.[0]?.image_uris?.small || null;
+                }
+            } catch (error) {
+                console.error(`Failed to fetch image for ${cardName}:`, error);
+            }
+            return null;
+        }
+
         // Display results
         function displayResults(data) {
             // Update header
-            document.getElementById('deckName').textContent = data.deckName;
-            document.getElementById('totalCards').textContent = data.totalCards;
+            document.getElementById('deckName').textContent = data.name || data.deckName;
+            document.getElementById('totalCards').textContent = data.cards.length;
             
             const badge = document.getElementById('sourceBadge');
-            badge.textContent = data.source.toUpperCase();
-            badge.className = `source-badge ${data.source}`;
+            badge.textContent = (data.source || 'api').toUpperCase();
+            badge.className = `source-badge ${data.source || 'api'}`;
             
             // Update totals
             document.getElementById('hareruyaJpy').textContent = data.totals.hareruya_jpy.toLocaleString();
@@ -516,29 +552,52 @@
             
             // Update cards table
             const tbody = document.getElementById('cardsTableBody');
-            tbody.innerHTML = data.cards.map(card => {
-                const isOutOfStock = card.hareruya_note === 'OUT OF STOCK';
+            tbody.innerHTML = data.cards.map((card, index) => {
+                // Handle both nested and flat structures
+                const hareruyaData = card.hareruya || {};
+                const ckData = card.cardkingdom || {};
+                
+                const hareruyaJpy = hareruyaData.price_jpy || 0;
+                const hareruyaUsd = hareruyaData.price_usd || 0;
+                const ckUsd = ckData.price_usd || 0;
+                const hareruyaStock = hareruyaData.stock || 0;
+                
+                const isOutOfStock = hareruyaStock === 0;
+                
                 return `
                     <tr>
-                        <td>${card.name}</td>
+                        <td>
+                            <div class="card-cell">
+                                <img class="card-image loading" id="cardImg${index}" alt="${card.name}">
+                                <span class="card-name">${card.name}</span>
+                            </div>
+                        </td>
                         <td>${card.quantity}</td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
-                            ${card.hareruya_price_jpy ? '¥' + card.hareruya_price_jpy : 'N/A'}
+                            ${hareruyaJpy ? '¥' + hareruyaJpy : '-'}
                         </td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
-                            ${card.hareruya_price_usd ? '$' + card.hareruya_price_usd.toFixed(2) : 'N/A'}
+                            ${hareruyaUsd ? '$' + hareruyaUsd.toFixed(2) : '-'}
                         </td>
-                        <td>${card.cardkingdom_price_usd ? '$' + card.cardkingdom_price_usd.toFixed(2) : 'N/A'}</td>
-                        <td>${card.hareruya_language || '-'}</td>
-                        <td>${card.hareruya_condition || '-'}</td>
-                        <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
-                            ${card.hareruya_note || '-'}
-                        </td>
+                        <td>${ckUsd ? '$' + ckUsd.toFixed(2) : '-'}</td>
+                        <td>${hareruyaStock > 0 ? hareruyaStock : (isOutOfStock ? 'Out of Stock' : '-')}</td>
                     </tr>
                 `;
             }).join('');
             
             showResults();
+            
+            // Fetch card images asynchronously
+            data.cards.forEach(async (card, index) => {
+                const imageUrl = await getCardImage(card.name);
+                const imgElement = document.getElementById(`cardImg${index}`);
+                if (imgElement && imageUrl) {
+                    imgElement.src = imageUrl;
+                    imgElement.classList.remove('loading');
+                } else if (imgElement) {
+                    imgElement.style.display = 'none';
+                }
+            });
             
             // Scroll to results
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
