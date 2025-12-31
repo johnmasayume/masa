@@ -269,6 +269,25 @@
             color: #ff6b6b;
             font-weight: bold;
         }
+        .in-stock {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        .stock-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .stock-badge.available {
+            background: #1e4620;
+            color: #4caf50;
+        }
+        .stock-badge.unavailable {
+            background: #4a1f1f;
+            color: #ff6b6b;
+        }
         .source-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -731,7 +750,7 @@
                         <th>Hareruya (¥)</th>
                         <th>Hareruya ($)</th>
                         <th>Card Kingdom ($)</th>
-                        <th>Stock</th>
+                        <th>Availability</th>
                     </tr>
                 </thead>
                 <tbody id="cardsTableBody">
@@ -1077,6 +1096,9 @@
                 const hareruyaStock = hareruyaData.stock || 0;
                 
                 const isOutOfStock = hareruyaStock === 0;
+                const stockStatus = hareruyaStock > 0 ? 
+                    '<span class="stock-badge available">✓ Available</span>' : 
+                    '<span class="stock-badge unavailable">✗ Out of Stock</span>';
                 const primaryType = card.metadata.primary_type || 'Unknown';
                 const typeClass = primaryType.toLowerCase();
                 
@@ -1103,7 +1125,7 @@
                             ${hareruyaUsd ? '$' + hareruyaUsd.toFixed(2) : '-'}
                         </td>
                         <td>${ckUsd ? '$' + ckUsd.toFixed(2) : '-'}</td>
-                        <td>${hareruyaStock > 0 ? hareruyaStock : (isOutOfStock ? 'Out of Stock' : '-')}</td>
+                        <td>${stockStatus}</td>
                     </tr>
                 `;
             }).join('');
