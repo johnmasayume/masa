@@ -722,6 +722,9 @@
                 <h2 class="deck-name" id="deckName"></h2>
                 <p>Total Cards: <strong id="totalCards"></strong></p>
                 <p>Source: <span class="source-badge" id="sourceBadge"></span></p>
+                <button class="btn" id="refreshBuylistBtn" style="display: none; margin-top: 10px;" onclick="refreshBuylist()">
+                    🔄 Refresh Buy List
+                </button>
             </div>
 
             <div class="totals-grid">
@@ -911,6 +914,62 @@
             }
         }
 
+        // Refresh buylist with latest deck data
+        async function refreshBuylist() {
+            if (!currentDeckData || currentDeckData.source !== 'buylist') {
+                showError('Can only refresh buylists');
+                return;
+            }
+
+            const buylistId = currentDeckData.deckId.replace('buylist-', '');
+            
+            if (!confirm('Refresh this buy list with the latest card prices from all decks?')) {
+                return;
+            }
+
+            showLoading('Refreshing buy list with latest prices...');
+            
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/buylists/${buylistId}`, {
+                    method: 'PUT'
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to refresh buy list');
+                }
+                
+                const data = await response.json();
+                console.log('Refreshed buylist data:', data);
+                hideLoading();
+                
+                // Transform and display updated data
+                const transformedData = {
+                    deckName: `Buy List #${buylistId} (${data.deck_count} Decks)`,
+                    deckId: `buylist-${buylistId}`,
+                    totalCards: data.total_cards,
+                    cards: data.consolidated_cards,
+                    totals: data.totals,
+                    source: 'buylist',
+                    metadata: {
+                        generated_at: data.generated_at,
+                        deck_count: data.deck_count,
+                        deck_ids: data.deck_ids,
+                        deck_names: data.deck_names
+                    }
+                };
+                
+                await displayResults(transformedData);
+                
+                // Show success message
+                alert('Buy list refreshed successfully with latest prices!');
+            } catch (error) {
+                hideLoading();
+                showError(`Failed to refresh: ${error.message}`);
+                console.error('Refresh error:', error);
+            }
+        }
+
         // Dual-mode pricing function
         async function priceDeck(deckUrl) {
             const useApi = localStorage.getItem(CONFIG.STORAGE_KEY) === 'true';
@@ -996,6 +1055,7 @@
             document.getElementById('totalCards').textContent = data.totalCards || data.cards.length;
             
             const badge = document.getElementById('sourceBadge');
+            const refreshBtn = document.getElementById('refreshBuylistBtn');
             
             // Show buylist-specific metadata if present
             if (data.source === 'buylist' && data.metadata) {
@@ -1006,9 +1066,15 @@
                 const deckNameEl = document.getElementById('deckName');
                 deckNameEl.textContent = data.deckName;
                 deckNameEl.title = `Consolidated from deck IDs: ${data.metadata.deck_ids.join(', ')}`;
+                
+                // Show refresh button for buylists
+                refreshBtn.style.display = 'inline-block';
             } else {
                 badge.textContent = (data.source || 'api').toUpperCase();
                 badge.className = `source-badge ${data.source || 'api'}`;
+                
+                // Hide refresh button for regular decks
+                refreshBtn.style.display = 'none';
             }
             
             // Update totals
