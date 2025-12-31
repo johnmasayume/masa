@@ -344,18 +344,21 @@
         .search-clear {
             position: relative;
         }
+        .search-clear input {
+            padding-right: 35px; /* Make room for the X button */
+        }
         .search-clear-btn {
             position: absolute;
             right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
+            bottom: 8px; /* Position from bottom instead of top */
             background: none;
             border: none;
             color: #4a90e2;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             padding: 0 5px;
             display: none;
+            line-height: 1;
         }
         .search-clear-btn:hover {
             color: #67b5ff;
