@@ -450,6 +450,11 @@
 
         // Price via FastAPI backend
         async function priceDeckViaAPI(deckUrl) {
+            // Check for mixed content issue
+            if (window.location.protocol === 'https:' && CONFIG.API_BASE_URL.startsWith('http:')) {
+                throw new Error('⚠️ Mixed Content Error: Cannot call HTTP API from HTTPS page. Solution: Open this page from http://localhost:8080/price.html or add HTTPS to your API.');
+            }
+            
             try {
                 const response = await fetch(`${CONFIG.API_BASE_URL}/api/decks/moxfield`, {
                     method: 'POST',
@@ -480,6 +485,9 @@
                 
             } catch (error) {
                 console.error('API error:', error);
+                if (error.message.includes('Mixed Content')) {
+                    throw error;
+                }
                 throw new Error(`Failed to price deck via API: ${error.message}`);
             }
         }
