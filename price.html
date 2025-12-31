@@ -657,6 +657,103 @@
         }
         
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 0.9em;
+            }
+            
+            .nav-links a {
+                font-size: 0.9em;
+                padding: 8px 16px;
+            }
+            
+            .backend-selector {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            
+            .toggle-switch {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .btn {
+                font-size: 1em;
+                padding: 12px;
+            }
+            
+            .totals-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group label {
+                font-size: 0.85em;
+            }
+            
+            .filter-group select,
+            .filter-group input {
+                font-size: 0.9em;
+            }
+            
+            /* Make table scrollable horizontally */
+            .cards-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .cards-table {
+                font-size: 0.85em;
+                min-width: 800px; /* Ensure table doesn't compress too much */
+            }
+            
+            .cards-table th,
+            .cards-table td {
+                padding: 8px 6px;
+            }
+            
+            .card-image {
+                width: 30px;
+                height: 42px;
+            }
+            
+            .card-name {
+                font-size: 0.9em;
+            }
+            
+            .type-badge {
+                font-size: 0.7em;
+                padding: 2px 6px;
+            }
+            
+            .lang-badge {
+                font-size: 0.7em;
+                padding: 2px 6px;
+            }
+            
+            .stock-badge {
+                font-size: 0.75em;
+                padding: 3px 8px;
+            }
+            
             .modal {
                 padding: 10px;
             }
@@ -684,6 +781,14 @@
             
             .printings-grid {
                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .back-to-top {
+                width: 45px;
+                height: 45px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 20px;
             }
         }
     </style>
@@ -803,23 +908,25 @@
             
             <div id="resultsCount" style="color: #b0b0b0; margin-bottom: 10px; display: none;"></div>
             
-            <table class="cards-table">
-                <thead>
-                    <tr>
-                        <th>Card</th>
-                        <th>Type</th>
-                        <th>Mana Cost</th>
-                        <th>Qty</th>
-                        <th>Lang</th>
-                        <th>Hareruya (¥)</th>
-                        <th>Hareruya ($)</th>
-                        <th>Card Kingdom ($)</th>
-                        <th>Availability</th>
-                    </tr>
-                </thead>
-                <tbody id="cardsTableBody">
-                </tbody>
-            </table>
+            <div class="cards-table-container">
+                <table class="cards-table">
+                    <thead>
+                        <tr>
+                            <th>Card</th>
+                            <th>Type</th>
+                            <th>Mana Cost</th>
+                            <th>Qty</th>
+                            <th>Lang</th>
+                            <th>Hareruya (¥)</th>
+                            <th>Hareruya ($)</th>
+                            <th>Card Kingdom ($)</th>
+                            <th>Availability</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cardsTableBody">
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

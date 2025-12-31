@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kinnan buy list - Hareruya Deck Pricer (Moxfield)</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+    min-height: 100vh;
+    color: #e0e0e0;
+}
+.container {
+    background: #0f3460;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.hub-link {
+    display: inline-block;
+    color: #4a90e2;
+    text-decoration: none;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    transition: color 0.2s;
+}
+.hub-link:hover {
+    color: #67b5ff;
+}
+h1 {
+    color: #67b5ff;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+.moxfield-link {
+    display: block;
+    text-align: center;
+    margin: 10px 0 20px;
+}
+.moxfield-link a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-size: 1.1em;
+}
+.moxfield-link a:hover {
+    color: #67b5ff;
+}
+.summary {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f2944 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+.summary-item {
+    text-align: center;
+    padding: 10px;
+}
+.summary-item .value {
+    font-size: 2em;
+    font-weight: bold;
+}
+.summary-item .label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+.controls {
+    margin: 20px 0;
+    text-align: center;
+}
+.btn {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 1em;
+}
+.btn:hover {
+    background: #357abd;
+}
+.btn-secondary {
+    background: #5a6c7d;
+}
+.btn-secondary:hover {
+    background: #4a5568;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow-x: auto;
+    display: block;
+}
+thead, tbody {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+th {
+    background: #1e3a5f;
+    color: #67b5ff;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1e3a5f;
+    color: #e0e0e0;
+}
+tr:hover {
+    background: #1a2f4a;
+}
+tbody tr {
+    background: #0f3460;
+}
+.excluded {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+.out-of-stock {
+    background-color: #3d2f1f !important;
+}
+.checkbox-cell {
+    width: 30px;
+    text-align: center;
+}
+.img-cell {
+    width: 50px;
+}
+.qty-cell {
+    width: 50px;
+    text-align: center;
+}
+.price-cell {
+    width: 100px;
+    text-align: right;
+}
+.total-cell {
+    width: 100px;
+    text-align: right;
+    font-weight: bold;
+}
+.lang-cell {
+    width: 80px;
+    text-align: center;
+}
+.note-cell {
+    width: 150px;
+    font-size: 0.9em;
+    color: #9ca3af;
+}
+.card-img {
+    width: 40px;
+    height: 56px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.card-img:hover {
+    transform: scale(1.1);
+}
+.card-link {
+    color: #4a90e2;
+    text-decoration: none;
+}
+.card-link:hover {
+    color: #67b5ff;
+    text-decoration: underline;
+}
+.not-found {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+.lang-badge {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+.lang-en {
+    background: #1e3a8a;
+    color: #93c5fd;
+}
+.lang-jp {
+    background: #7f1d1d;
+    color: #fca5a5;
+}
+.foil-badge {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #333;
+}
+.section {
+    margin: 30px 0;
+}
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.section-title {
+    color: #67b5ff;
+    font-size: 1.5em;
+    margin: 0;
+}
+.section-total {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #667eea;
+}
+.grand-total {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 30px 0;
+}
+.grand-total-label {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+.grand-total-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-top: 10px;
+}
+.note-box {
+    background: #edf2f7;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+    border-left: 4px solid #667eea;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    align-items: center;
+    justify-content: center;
+}
+.modal.show {
+    display: flex;
+}
+.modal-content {
+    max-width: 90%;
+    max-height: 90%;
+}
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.buy-later {
+    background: #fff8dc;
+    border: 2px dashed #f39c12;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 30px;
+}
+.buy-later h3 {
+    color: #e67e22;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.buy-later-table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.buy-later-table thead {
+    background: #e67e22;
+    color: white;
+}
+.buy-later-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+.buy-later-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.buy-later-table tbody tr:hover {
+    background: #fff5e7;
+}
+.buy-later-empty {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+.section-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 600;
+    margin-left: 8px;
+    text-transform: uppercase;
+}
+.section-badge.mainboard {
+    background: #4299e1;
+    color: white;
+}
+.section-badge.sideboard {
+    background: #ed8936;
+    color: white;
+}
+.section-badge.commander {
+    background: #9f7aea;
+    color: white;
+}
+.close:hover {
+    color: #bbb;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding: 15px;
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+    .summary {
+        flex-direction: column;
+    }
+    .summary-item {
+        margin: 10px 0;
+    }
+    table {
+        font-size: 0.85em;
+    }
+    th, td {
+        padding: 8px 4px;
+    }
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.9em;
+        margin: 5px 2px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <a href="../index.html" class="hub-link">← Back to Hub</a>
+    </div>
+    <h1>💰 kinnan buy list (Moxfield)</h1>
+    <div class="moxfield-link">
+        <a href="https://moxfield.com/decks/BYdsZGFlRUiQdkKq6_qjYg" target="_blank">🔗 View on Moxfield</a>
+    </div>
+    <div class="summary">
+        <div class="summary-item">
+            <div class="value" id="totalCards">54</div>
+            <div class="label">Total Cards</div>
+        </div>
+        <div class="summary-item">
+            <div class="value">54</div>
+            <div class="label">Unique Cards</div>
+        </div>
+        <div class="summary-item">
+            <div class="value" id="cardsIncluded">54</div>
+            <div class="label">Cards Priced</div>
+        </div>
+        <div class="summary-item">
+            <div class="value">0</div>
+            <div class="label">Not Found</div>
+        </div>
+        <div class="summary-item">
+            <div class="value" id="outOfStock">1</div>
+            <div class="label">Out of Stock</div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn" onclick="selectAll()">✓ Select All</button>
+        <button class="btn btn-secondary" onclick="deselectAll()">✗ Deselect All</button>
+        <button class="btn" onclick="toggleFoundOnly()">💵 Only Found Cards</button>
+    </div>
+        
+
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">🃏 MAINBOARD</h2>
+            <span class="section-total" id="section-mainboard-total">¥14,690</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th class="checkbox-cell"></th>
+                    <th class="img-cell">Image</th>
+                    <th class="qty-cell">Qty</th>
+                    <th class="name-cell">Card Name</th>
+                    <th class="price-cell">Hareruya</th>
+                    <th class="price-cell">Card Kingdom</th>
+                    <th class="total-cell">Subtotal</th>
+                    <th class="lang-cell">Lang</th>
+                    <th class="note-cell">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+
+                <tr id="row-0" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-0" 
+                               data-qty="1" data-price="800" data-total="800"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/86676?lang=EN" 
+                               data-cardname="Miscast" data-imgurl="https://api.scryfall.com/cards/named?exact=Miscast&format=image&version=normal"
+                               data-lang="EN" data-note="Cheaper copies at ¥150 (out of stock)" 
+                               data-isfoil="true" data-ckprice="2.79" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Miscast&format=image&version=normal" alt="Miscast" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Miscast&format=image&version=normal', 'Miscast')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/86676?lang=EN" target="_blank" class="card-link">Miscast</a>
+                    </td>
+                    <td class="price-cell">¥800</td>
+                    <td class="price-cell">$2.79</td>
+                    <td class="total-cell">¥800</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell">Cheaper copies at ¥150 (out of stock)</td>
+                </tr>
+                
+
+                <tr id="row-1" class="out-of-stock excluded">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-1" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/56103?lang=EN" 
+                               data-cardname="Devoted Druid" data-imgurl="https://api.scryfall.com/cards/named?exact=Devoted%20Druid&format=image&version=normal"
+                               data-lang="EN" data-note="OUT OF STOCK" 
+                               data-isfoil="false" data-ckprice="1.49"  onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Devoted%20Druid&format=image&version=normal" alt="Devoted Druid" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Devoted%20Druid&format=image&version=normal', 'Devoted Druid')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/56103?lang=EN" target="_blank" class="card-link">Devoted Druid</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$1.49</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell">OUT OF STOCK</td>
+                </tr>
+                
+
+                <tr id="row-2" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-2" 
+                               data-qty="1" data-price="30" data-total="30"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/86854?lang=EN" 
+                               data-cardname="Prismite" data-imgurl="https://api.scryfall.com/cards/named?exact=Prismite&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Prismite&format=image&version=normal" alt="Prismite" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Prismite&format=image&version=normal', 'Prismite')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/86854?lang=EN" target="_blank" class="card-link">Prismite</a>
+                    </td>
+                    <td class="price-cell">¥30</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥30</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-3" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-3" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/15356?lang=EN" 
+                               data-cardname="Manglehorn" data-imgurl="https://api.scryfall.com/cards/named?exact=Manglehorn&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="1.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Manglehorn&format=image&version=normal" alt="Manglehorn" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Manglehorn&format=image&version=normal', 'Manglehorn')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/15356?lang=EN" target="_blank" class="card-link">Manglehorn</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$1.99</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-4" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-4" 
+                               data-qty="1" data-price="30" data-total="30"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/91328?lang=EN" 
+                               data-cardname="Dispel" data-imgurl="https://api.scryfall.com/cards/named?exact=Dispel&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.59" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Dispel&format=image&version=normal" alt="Dispel" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Dispel&format=image&version=normal', 'Dispel')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/91328?lang=EN" target="_blank" class="card-link">Dispel</a>
+                    </td>
+                    <td class="price-cell">¥30</td>
+                    <td class="price-cell">$0.59</td>
+                    <td class="total-cell">¥30</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-5" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-5" 
+                               data-qty="1" data-price="150" data-total="150"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/17138?lang=JP" 
+                               data-cardname="Autumn\'s Veil" data-imgurl="https://api.scryfall.com/cards/named?exact=Autumn%27s%20Veil&format=image&version=normal"
+                               data-lang="JP" data-note="EN not available - using JP" 
+                               data-isfoil="false" data-ckprice="0.79" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Autumn%27s%20Veil&format=image&version=normal" alt="Autumn's Veil" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Autumn%27s%20Veil&format=image&version=normal', 'Autumn\'s Veil')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/17138?lang=JP" target="_blank" class="card-link">Autumn's Veil</a>
+                    </td>
+                    <td class="price-cell">¥150</td>
+                    <td class="price-cell">$0.79</td>
+                    <td class="total-cell">¥150</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">EN not available - using JP</td>
+                </tr>
+                
+
+                <tr id="row-6" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-6" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/46406?lang=EN" 
+                               data-cardname="Prophet of Distortion" data-imgurl="https://api.scryfall.com/cards/named?exact=Prophet%20of%20Distortion&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Prophet%20of%20Distortion&format=image&version=normal" alt="Prophet of Distortion" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Prophet%20of%20Distortion&format=image&version=normal', 'Prophet of Distortion')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/46406?lang=EN" target="_blank" class="card-link">Prophet of Distortion</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-7" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-7" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/170176?lang=EN" 
+                               data-cardname="Reclamation Sage" data-imgurl="https://api.scryfall.com/cards/named?exact=Reclamation%20Sage&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Reclamation%20Sage&format=image&version=normal" alt="Reclamation Sage" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Reclamation%20Sage&format=image&version=normal', 'Reclamation Sage')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/170176?lang=EN" target="_blank" class="card-link">Reclamation Sage</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-8" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-8" 
+                               data-qty="1" data-price="500" data-total="500"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/185298?lang=EN" 
+                               data-cardname="Koma, Cosmos Serpent" data-imgurl="https://api.scryfall.com/cards/named?exact=Koma%2C%20Cosmos%20Serpent&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="3.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Koma%2C%20Cosmos%20Serpent&format=image&version=normal" alt="Koma, Cosmos Serpent" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Koma%2C%20Cosmos%20Serpent&format=image&version=normal', 'Koma, Cosmos Serpent')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/185298?lang=EN" target="_blank" class="card-link">Koma, Cosmos Serpent</a>
+                    </td>
+                    <td class="price-cell">¥500</td>
+                    <td class="price-cell">$3.99</td>
+                    <td class="total-cell">¥500</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-9" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-9" 
+                               data-qty="1" data-price="30" data-total="30"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/108499?lang=JP" 
+                               data-cardname="Moonsnare Prototype" data-imgurl="https://api.scryfall.com/cards/named?exact=Moonsnare%20Prototype&format=image&version=normal"
+                               data-lang="JP" data-note="EN not available - using JP" 
+                               data-isfoil="false" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Moonsnare%20Prototype&format=image&version=normal" alt="Moonsnare Prototype" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Moonsnare%20Prototype&format=image&version=normal', 'Moonsnare Prototype')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/108499?lang=JP" target="_blank" class="card-link">Moonsnare Prototype</a>
+                    </td>
+                    <td class="price-cell">¥30</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥30</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">EN not available - using JP</td>
+                </tr>
+                
+
+                <tr id="row-10" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-10" 
+                               data-qty="1" data-price="80" data-total="80"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/108646?lang=JP" 
+                               data-cardname="Colossal Skyturtle" data-imgurl="https://api.scryfall.com/cards/named?exact=Colossal%20Skyturtle&format=image&version=normal"
+                               data-lang="JP" data-note="EN not available - using JP" 
+                               data-isfoil="false" data-ckprice="0.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Colossal%20Skyturtle&format=image&version=normal" alt="Colossal Skyturtle" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Colossal%20Skyturtle&format=image&version=normal', 'Colossal Skyturtle')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/108646?lang=JP" target="_blank" class="card-link">Colossal Skyturtle</a>
+                    </td>
+                    <td class="price-cell">¥80</td>
+                    <td class="price-cell">$0.99</td>
+                    <td class="total-cell">¥80</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">EN not available - using JP</td>
+                </tr>
+                
+
+                <tr id="row-11" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-11" 
+                               data-qty="1" data-price="150" data-total="150"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/160889?lang=EN" 
+                               data-cardname="Mirage Mirror" data-imgurl="https://api.scryfall.com/cards/named?exact=Mirage%20Mirror&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.79" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Mirage%20Mirror&format=image&version=normal" alt="Mirage Mirror" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Mirage%20Mirror&format=image&version=normal', 'Mirage Mirror')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/160889?lang=EN" target="_blank" class="card-link">Mirage Mirror</a>
+                    </td>
+                    <td class="price-cell">¥150</td>
+                    <td class="price-cell">$0.79</td>
+                    <td class="total-cell">¥150</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-12" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-12" 
+                               data-qty="1" data-price="900" data-total="900"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/14445?lang=EN" 
+                               data-cardname="Whir of Invention" data-imgurl="https://api.scryfall.com/cards/named?exact=Whir%20of%20Invention&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="4.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Whir%20of%20Invention&format=image&version=normal" alt="Whir of Invention" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Whir%20of%20Invention&format=image&version=normal', 'Whir of Invention')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/14445?lang=EN" target="_blank" class="card-link">Whir of Invention</a>
+                    </td>
+                    <td class="price-cell">¥900</td>
+                    <td class="price-cell">$4.99</td>
+                    <td class="total-cell">¥900</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-13" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-13" 
+                               data-qty="1" data-price="1500" data-total="1500"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/121856?lang=EN" 
+                               data-cardname="Machine God\'s Effigy" data-imgurl="https://api.scryfall.com/cards/named?exact=Machine%20God%27s%20Effigy&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="6.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Machine%20God%27s%20Effigy&format=image&version=normal" alt="Machine God's Effigy" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Machine%20God%27s%20Effigy&format=image&version=normal', 'Machine God\'s Effigy')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/121856?lang=EN" target="_blank" class="card-link">Machine God's Effigy</a>
+                    </td>
+                    <td class="price-cell">¥1,500</td>
+                    <td class="price-cell">$6.49</td>
+                    <td class="total-cell">¥1,500</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-14" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-14" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/31406?lang=EN" 
+                               data-cardname="Springleaf Drum" data-imgurl="https://api.scryfall.com/cards/named?exact=Springleaf%20Drum&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Springleaf%20Drum&format=image&version=normal" alt="Springleaf Drum" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Springleaf%20Drum&format=image&version=normal', 'Springleaf Drum')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/31406?lang=EN" target="_blank" class="card-link">Springleaf Drum</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$0.99</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-15" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-15" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/121537?lang=EN" 
+                               data-cardname="Hulking Metamorph" data-imgurl="https://api.scryfall.com/cards/named?exact=Hulking%20Metamorph&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Hulking%20Metamorph&format=image&version=normal" alt="Hulking Metamorph" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Hulking%20Metamorph&format=image&version=normal', 'Hulking Metamorph')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/121537?lang=EN" target="_blank" class="card-link">Hulking Metamorph</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-16" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-16" 
+                               data-qty="1" data-price="30" data-total="30"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/122222?lang=EN" 
+                               data-cardname="Citanul Stalwart" data-imgurl="https://api.scryfall.com/cards/named?exact=Citanul%20Stalwart&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Citanul%20Stalwart&format=image&version=normal" alt="Citanul Stalwart" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Citanul%20Stalwart&format=image&version=normal', 'Citanul Stalwart')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/122222?lang=EN" target="_blank" class="card-link">Citanul Stalwart</a>
+                    </td>
+                    <td class="price-cell">¥30</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥30</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-17" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-17" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/176823?lang=EN" 
+                               data-cardname="Fauna Shaman" data-imgurl="https://api.scryfall.com/cards/named?exact=Fauna%20Shaman&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="2.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Fauna%20Shaman&format=image&version=normal" alt="Fauna Shaman" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Fauna%20Shaman&format=image&version=normal', 'Fauna Shaman')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/176823?lang=EN" target="_blank" class="card-link">Fauna Shaman</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$2.99</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-18" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-18" 
+                               data-qty="1" data-price="1000" data-total="1000"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/2277?lang=EN" 
+                               data-cardname="Basalt Monolith" data-imgurl="https://api.scryfall.com/cards/named?exact=Basalt%20Monolith&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="4.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Basalt%20Monolith&format=image&version=normal" alt="Basalt Monolith" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Basalt%20Monolith&format=image&version=normal', 'Basalt Monolith')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/2277?lang=EN" target="_blank" class="card-link">Basalt Monolith</a>
+                    </td>
+                    <td class="price-cell">¥1,000</td>
+                    <td class="price-cell">$4.49</td>
+                    <td class="total-cell">¥1,000</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-19" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-19" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/93668?lang=EN" 
+                               data-cardname="Elvish Mystic" data-imgurl="https://api.scryfall.com/cards/named?exact=Elvish%20Mystic&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="1.29" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Elvish%20Mystic&format=image&version=normal" alt="Elvish Mystic" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Elvish%20Mystic&format=image&version=normal', 'Elvish Mystic')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/93668?lang=EN" target="_blank" class="card-link">Elvish Mystic</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$1.29</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-20" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-20" 
+                               data-qty="1" data-price="30" data-total="30"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/73915?lang=EN" 
+                               data-cardname="Waterlogged Grove" data-imgurl="https://api.scryfall.com/cards/named?exact=Waterlogged%20Grove&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.59" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Waterlogged%20Grove&format=image&version=normal" alt="Waterlogged Grove" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Waterlogged%20Grove&format=image&version=normal', 'Waterlogged Grove')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/73915?lang=EN" target="_blank" class="card-link">Waterlogged Grove</a>
+                    </td>
+                    <td class="price-cell">¥30</td>
+                    <td class="price-cell">$0.59</td>
+                    <td class="total-cell">¥30</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-21" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-21" 
+                               data-qty="1" data-price="900" data-total="900"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/58203?lang=JP" 
+                               data-cardname="Nezahal, Primal Tide" data-imgurl="https://api.scryfall.com/cards/named?exact=Nezahal%2C%20Primal%20Tide&format=image&version=normal"
+                               data-lang="JP" data-note="JP cheaper by ¥600" 
+                               data-isfoil="false" data-ckprice="11.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Nezahal%2C%20Primal%20Tide&format=image&version=normal" alt="Nezahal, Primal Tide" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Nezahal%2C%20Primal%20Tide&format=image&version=normal', 'Nezahal, Primal Tide')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/58203?lang=JP" target="_blank" class="card-link">Nezahal, Primal Tide</a>
+                    </td>
+                    <td class="price-cell">¥900</td>
+                    <td class="price-cell">$11.99</td>
+                    <td class="total-cell">¥900</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">JP cheaper by ¥600</td>
+                </tr>
+                
+
+                <tr id="row-22" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-22" 
+                               data-qty="1" data-price="30" data-total="30"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/149869?lang=EN" 
+                               data-cardname="Drift of Phantasms" data-imgurl="https://api.scryfall.com/cards/named?exact=Drift%20of%20Phantasms&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.69" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Drift%20of%20Phantasms&format=image&version=normal" alt="Drift of Phantasms" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Drift%20of%20Phantasms&format=image&version=normal', 'Drift of Phantasms')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/149869?lang=EN" target="_blank" class="card-link">Drift of Phantasms</a>
+                    </td>
+                    <td class="price-cell">¥30</td>
+                    <td class="price-cell">$0.69</td>
+                    <td class="total-cell">¥30</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-23" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-23" 
+                               data-qty="1" data-price="300" data-total="300"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/132693?lang=EN" 
+                               data-cardname="Muddle the Mixture" data-imgurl="https://api.scryfall.com/cards/named?exact=Muddle%20the%20Mixture&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="3.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Muddle%20the%20Mixture&format=image&version=normal" alt="Muddle the Mixture" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Muddle%20the%20Mixture&format=image&version=normal', 'Muddle the Mixture')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/132693?lang=EN" target="_blank" class="card-link">Muddle the Mixture</a>
+                    </td>
+                    <td class="price-cell">¥300</td>
+                    <td class="price-cell">$3.49</td>
+                    <td class="total-cell">¥300</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-24" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-24" 
+                               data-qty="1" data-price="980" data-total="980"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/80864?lang=EN" 
+                               data-cardname="Phyrexian Metamorph" data-imgurl="https://api.scryfall.com/cards/named?exact=Phyrexian%20Metamorph&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="4.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Phyrexian%20Metamorph&format=image&version=normal" alt="Phyrexian Metamorph" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Phyrexian%20Metamorph&format=image&version=normal', 'Phyrexian Metamorph')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/80864?lang=EN" target="_blank" class="card-link">Phyrexian Metamorph</a>
+                    </td>
+                    <td class="price-cell">¥980</td>
+                    <td class="price-cell">$4.49</td>
+                    <td class="total-cell">¥980</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-25" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-25" 
+                               data-qty="1" data-price="100" data-total="100"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/81707?lang=EN" 
+                               data-cardname="Priest of Titania" data-imgurl="https://api.scryfall.com/cards/named?exact=Priest%20of%20Titania&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.69" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Priest%20of%20Titania&format=image&version=normal" alt="Priest of Titania" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Priest%20of%20Titania&format=image&version=normal', 'Priest of Titania')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/81707?lang=EN" target="_blank" class="card-link">Priest of Titania</a>
+                    </td>
+                    <td class="price-cell">¥100</td>
+                    <td class="price-cell">$0.69</td>
+                    <td class="total-cell">¥100</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-26" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-26" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/157956?lang=EN" 
+                               data-cardname="Decisive Denial" data-imgurl="https://api.scryfall.com/cards/named?exact=Decisive%20Denial&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.39" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Decisive%20Denial&format=image&version=normal" alt="Decisive Denial" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Decisive%20Denial&format=image&version=normal', 'Decisive Denial')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/157956?lang=EN" target="_blank" class="card-link">Decisive Denial</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$0.39</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-27" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-27" 
+                               data-qty="1" data-price="150" data-total="150"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/170925?lang=EN" 
+                               data-cardname="Drown in Dreams" data-imgurl="https://api.scryfall.com/cards/named?exact=Drown%20in%20Dreams&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.69" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Drown%20in%20Dreams&format=image&version=normal" alt="Drown in Dreams" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Drown%20in%20Dreams&format=image&version=normal', 'Drown in Dreams')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/170925?lang=EN" target="_blank" class="card-link">Drown in Dreams</a>
+                    </td>
+                    <td class="price-cell">¥150</td>
+                    <td class="price-cell">$0.69</td>
+                    <td class="total-cell">¥150</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-28" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-28" 
+                               data-qty="1" data-price="80" data-total="80"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/123624?lang=EN" 
+                               data-cardname="Terastodon" data-imgurl="https://api.scryfall.com/cards/named?exact=Terastodon&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Terastodon&format=image&version=normal" alt="Terastodon" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Terastodon&format=image&version=normal', 'Terastodon')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/123624?lang=EN" target="_blank" class="card-link">Terastodon</a>
+                    </td>
+                    <td class="price-cell">¥80</td>
+                    <td class="price-cell">$0.49</td>
+                    <td class="total-cell">¥80</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-29" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-29" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/92811?lang=EN" 
+                               data-cardname="Jaspera Sentinel" data-imgurl="https://api.scryfall.com/cards/named?exact=Jaspera%20Sentinel&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Jaspera%20Sentinel&format=image&version=normal" alt="Jaspera Sentinel" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Jaspera%20Sentinel&format=image&version=normal', 'Jaspera Sentinel')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/92811?lang=EN" target="_blank" class="card-link">Jaspera Sentinel</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-30" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-30" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/166118?lang=EN" 
+                               data-cardname="Thorn Mammoth" data-imgurl="https://api.scryfall.com/cards/named?exact=Thorn%20Mammoth&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Thorn%20Mammoth&format=image&version=normal" alt="Thorn Mammoth" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Thorn%20Mammoth&format=image&version=normal', 'Thorn Mammoth')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/166118?lang=EN" target="_blank" class="card-link">Thorn Mammoth</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$0.99</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-31" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-31" 
+                               data-qty="1" data-price="300" data-total="300"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/161266?lang=EN" 
+                               data-cardname="Flooded Grove" data-imgurl="https://api.scryfall.com/cards/named?exact=Flooded%20Grove&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Flooded%20Grove&format=image&version=normal" alt="Flooded Grove" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Flooded%20Grove&format=image&version=normal', 'Flooded Grove')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/161266?lang=EN" target="_blank" class="card-link">Flooded Grove</a>
+                    </td>
+                    <td class="price-cell">¥300</td>
+                    <td class="price-cell">$0.49</td>
+                    <td class="total-cell">¥300</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-32" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-32" 
+                               data-qty="1" data-price="100" data-total="100"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/150096?lang=EN" 
+                               data-cardname="Simic Signet" data-imgurl="https://api.scryfall.com/cards/named?exact=Simic%20Signet&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.35" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Simic%20Signet&format=image&version=normal" alt="Simic Signet" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Simic%20Signet&format=image&version=normal', 'Simic Signet')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/150096?lang=EN" target="_blank" class="card-link">Simic Signet</a>
+                    </td>
+                    <td class="price-cell">¥100</td>
+                    <td class="price-cell">$0.35</td>
+                    <td class="total-cell">¥100</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-33" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-33" 
+                               data-qty="1" data-price="300" data-total="300"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/41243?lang=EN" 
+                               data-cardname="Tree of Tales" data-imgurl="https://api.scryfall.com/cards/named?exact=Tree%20of%20Tales&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="1.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Tree%20of%20Tales&format=image&version=normal" alt="Tree of Tales" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Tree%20of%20Tales&format=image&version=normal', 'Tree of Tales')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/41243?lang=EN" target="_blank" class="card-link">Tree of Tales</a>
+                    </td>
+                    <td class="price-cell">¥300</td>
+                    <td class="price-cell">$1.49</td>
+                    <td class="total-cell">¥300</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-34" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-34" 
+                               data-qty="1" data-price="280" data-total="280"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/173160?lang=EN" 
+                               data-cardname="Talisman of Curiosity" data-imgurl="https://api.scryfall.com/cards/named?exact=Talisman%20of%20Curiosity&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.69" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Talisman%20of%20Curiosity&format=image&version=normal" alt="Talisman of Curiosity" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Talisman%20of%20Curiosity&format=image&version=normal', 'Talisman of Curiosity')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/173160?lang=EN" target="_blank" class="card-link">Talisman of Curiosity</a>
+                    </td>
+                    <td class="price-cell">¥280</td>
+                    <td class="price-cell">$0.69</td>
+                    <td class="total-cell">¥280</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-35" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-35" 
+                               data-qty="1" data-price="300" data-total="300"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/165215?lang=EN" 
+                               data-cardname="An Offer You Can\'t Refuse" data-imgurl="https://api.scryfall.com/cards/named?exact=An%20Offer%20You%20Can%27t%20Refuse&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="3.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=An%20Offer%20You%20Can%27t%20Refuse&format=image&version=normal" alt="An Offer You Can't Refuse" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=An%20Offer%20You%20Can%27t%20Refuse&format=image&version=normal', 'An Offer You Can\'t Refuse')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/165215?lang=EN" target="_blank" class="card-link">An Offer You Can't Refuse</a>
+                    </td>
+                    <td class="price-cell">¥300</td>
+                    <td class="price-cell">$3.49</td>
+                    <td class="total-cell">¥300</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-36" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-36" 
+                               data-qty="1" data-price="80" data-total="80"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/179653?lang=EN" 
+                               data-cardname="Nature\'s Claim" data-imgurl="https://api.scryfall.com/cards/named?exact=Nature%27s%20Claim&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="1.29" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Nature%27s%20Claim&format=image&version=normal" alt="Nature's Claim" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Nature%27s%20Claim&format=image&version=normal', 'Nature\'s Claim')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/179653?lang=EN" target="_blank" class="card-link">Nature's Claim</a>
+                    </td>
+                    <td class="price-cell">¥80</td>
+                    <td class="price-cell">$1.29</td>
+                    <td class="total-cell">¥80</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-37" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-37" 
+                               data-qty="1" data-price="400" data-total="400"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/44468?lang=EN" 
+                               data-cardname="Beast Within" data-imgurl="https://api.scryfall.com/cards/named?exact=Beast%20Within&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="1.29" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Beast%20Within&format=image&version=normal" alt="Beast Within" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Beast%20Within&format=image&version=normal', 'Beast Within')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/44468?lang=EN" target="_blank" class="card-link">Beast Within</a>
+                    </td>
+                    <td class="price-cell">¥400</td>
+                    <td class="price-cell">$1.29</td>
+                    <td class="total-cell">¥400</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-38" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-38" 
+                               data-qty="1" data-price="400" data-total="400"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/181986?lang=EN" 
+                               data-cardname="Command Tower" data-imgurl="https://api.scryfall.com/cards/named?exact=Command%20Tower&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.59" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Command%20Tower&format=image&version=normal" alt="Command Tower" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Command%20Tower&format=image&version=normal', 'Command Tower')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/181986?lang=EN" target="_blank" class="card-link">Command Tower</a>
+                    </td>
+                    <td class="price-cell">¥400</td>
+                    <td class="price-cell">$0.59</td>
+                    <td class="total-cell">¥400</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-39" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-39" 
+                               data-qty="1" data-price="300" data-total="300"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/33820?lang=EN" 
+                               data-cardname="Seat of the Synod" data-imgurl="https://api.scryfall.com/cards/named?exact=Seat%20of%20the%20Synod&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="1.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Seat%20of%20the%20Synod&format=image&version=normal" alt="Seat of the Synod" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Seat%20of%20the%20Synod&format=image&version=normal', 'Seat of the Synod')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/33820?lang=EN" target="_blank" class="card-link">Seat of the Synod</a>
+                    </td>
+                    <td class="price-cell">¥300</td>
+                    <td class="price-cell">$1.49</td>
+                    <td class="total-cell">¥300</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-40" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-40" 
+                               data-qty="1" data-price="100" data-total="100"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/170973?lang=EN" 
+                               data-cardname="Exotic Orchard" data-imgurl="https://api.scryfall.com/cards/named?exact=Exotic%20Orchard&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.59" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Exotic%20Orchard&format=image&version=normal" alt="Exotic Orchard" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Exotic%20Orchard&format=image&version=normal', 'Exotic Orchard')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/170973?lang=EN" target="_blank" class="card-link">Exotic Orchard</a>
+                    </td>
+                    <td class="price-cell">¥100</td>
+                    <td class="price-cell">$0.59</td>
+                    <td class="total-cell">¥100</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-41" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-41" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/180544?lang=EN" 
+                               data-cardname="Scour for Scrap" data-imgurl="https://api.scryfall.com/cards/named?exact=Scour%20for%20Scrap&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="1.29" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Scour%20for%20Scrap&format=image&version=normal" alt="Scour for Scrap" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Scour%20for%20Scrap&format=image&version=normal', 'Scour for Scrap')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/180544?lang=EN" target="_blank" class="card-link">Scour for Scrap</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$1.29</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-42" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-42" 
+                               data-qty="1" data-price="300" data-total="300"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/60648?lang=JP" 
+                               data-cardname="Cryptolith Rite" data-imgurl="https://api.scryfall.com/cards/named?exact=Cryptolith%20Rite&format=image&version=normal"
+                               data-lang="JP" data-note="JP cheaper by ¥400" 
+                               data-isfoil="false" data-ckprice="5.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Cryptolith%20Rite&format=image&version=normal" alt="Cryptolith Rite" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Cryptolith%20Rite&format=image&version=normal', 'Cryptolith Rite')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/60648?lang=JP" target="_blank" class="card-link">Cryptolith Rite</a>
+                    </td>
+                    <td class="price-cell">¥300</td>
+                    <td class="price-cell">$5.99</td>
+                    <td class="total-cell">¥300</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">JP cheaper by ¥400</td>
+                </tr>
+                
+
+                <tr id="row-43" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-43" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/83704?lang=JP" 
+                               data-cardname="Kogla, the Titan Ape" data-imgurl="https://api.scryfall.com/cards/named?exact=Kogla%2C%20the%20Titan%20Ape&format=image&version=normal"
+                               data-lang="JP" data-note="JP cheaper by ¥400" 
+                               data-isfoil="false" data-ckprice="5.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Kogla%2C%20the%20Titan%20Ape&format=image&version=normal" alt="Kogla, the Titan Ape" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Kogla%2C%20the%20Titan%20Ape&format=image&version=normal', 'Kogla, the Titan Ape')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/83704?lang=JP" target="_blank" class="card-link">Kogla, the Titan Ape</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$5.99</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">JP cheaper by ¥400</td>
+                </tr>
+                
+
+                <tr id="row-44" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-44" 
+                               data-qty="1" data-price="80" data-total="80"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/117795?lang=JP" 
+                               data-cardname="Thran Portal" data-imgurl="https://api.scryfall.com/cards/named?exact=Thran%20Portal&format=image&version=normal"
+                               data-lang="JP" data-note="EN not available - using JP" 
+                               data-isfoil="true" data-ckprice="0.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Thran%20Portal&format=image&version=normal" alt="Thran Portal" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Thran%20Portal&format=image&version=normal', 'Thran Portal')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/117795?lang=JP" target="_blank" class="card-link">Thran Portal</a>
+                    </td>
+                    <td class="price-cell">¥80</td>
+                    <td class="price-cell">$0.99</td>
+                    <td class="total-cell">¥80</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp foil-badge">JP (Foil)</span></td>
+                    <td class="note-cell">EN not available - using JP</td>
+                </tr>
+                
+
+                <tr id="row-45" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-45" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/114847?lang=EN" 
+                               data-cardname="Eternal Witness" data-imgurl="https://api.scryfall.com/cards/named?exact=Eternal%20Witness&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="2.29" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Eternal%20Witness&format=image&version=normal" alt="Eternal Witness" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Eternal%20Witness&format=image&version=normal', 'Eternal Witness')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/114847?lang=EN" target="_blank" class="card-link">Eternal Witness</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$2.29</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-46" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-46" 
+                               data-qty="1" data-price="200" data-total="200"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/147768?lang=JP" 
+                               data-cardname="Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun" data-imgurl="https://api.scryfall.com/cards/named?exact=Growing%20Rites%20of%20Itlimoc%20//%20Itlimoc%2C%20Cradle%20of%20the%20Sun&format=image&version=normal"
+                               data-lang="JP" data-note="JP cheaper by ¥600" 
+                               data-isfoil="false" data-ckprice="6.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Growing%20Rites%20of%20Itlimoc%20//%20Itlimoc%2C%20Cradle%20of%20the%20Sun&format=image&version=normal" alt="Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Growing%20Rites%20of%20Itlimoc%20//%20Itlimoc%2C%20Cradle%20of%20the%20Sun&format=image&version=normal', 'Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/147768?lang=JP" target="_blank" class="card-link">Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun</a>
+                    </td>
+                    <td class="price-cell">¥200</td>
+                    <td class="price-cell">$6.99</td>
+                    <td class="total-cell">¥200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">JP cheaper by ¥600</td>
+                </tr>
+                
+
+                <tr id="row-47" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-47" 
+                               data-qty="1" data-price="900" data-total="900"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/151371?lang=EN" 
+                               data-cardname="Archdruid\'s Charm" data-imgurl="https://api.scryfall.com/cards/named?exact=Archdruid%27s%20Charm&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="9.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Archdruid%27s%20Charm&format=image&version=normal" alt="Archdruid's Charm" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Archdruid%27s%20Charm&format=image&version=normal', 'Archdruid\'s Charm')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/151371?lang=EN" target="_blank" class="card-link">Archdruid's Charm</a>
+                    </td>
+                    <td class="price-cell">¥900</td>
+                    <td class="price-cell">$9.49</td>
+                    <td class="total-cell">¥900</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-48" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-48" 
+                               data-qty="1" data-price="100" data-total="100"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/172531?lang=EN" 
+                               data-cardname="Spell Pierce" data-imgurl="https://api.scryfall.com/cards/named?exact=Spell%20Pierce&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.79" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Spell%20Pierce&format=image&version=normal" alt="Spell Pierce" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Spell%20Pierce&format=image&version=normal', 'Spell Pierce')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/172531?lang=EN" target="_blank" class="card-link">Spell Pierce</a>
+                    </td>
+                    <td class="price-cell">¥100</td>
+                    <td class="price-cell">$0.79</td>
+                    <td class="total-cell">¥100</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-49" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-49" 
+                               data-qty="1" data-price="800" data-total="800"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/175836?lang=EN" 
+                               data-cardname="Nature\'s Rhythm" data-imgurl="https://api.scryfall.com/cards/named?exact=Nature%27s%20Rhythm&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="6.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Nature%27s%20Rhythm&format=image&version=normal" alt="Nature's Rhythm" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Nature%27s%20Rhythm&format=image&version=normal', 'Nature\'s Rhythm')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/175836?lang=EN" target="_blank" class="card-link">Nature's Rhythm</a>
+                    </td>
+                    <td class="price-cell">¥800</td>
+                    <td class="price-cell">$6.99</td>
+                    <td class="total-cell">¥800</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-50" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-50" 
+                               data-qty="1" data-price="80" data-total="80"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/177972?lang=EN" 
+                               data-cardname="Vineglimmer Snarl" data-imgurl="https://api.scryfall.com/cards/named?exact=Vineglimmer%20Snarl&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="false" data-ckprice="0.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Vineglimmer%20Snarl&format=image&version=normal" alt="Vineglimmer Snarl" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Vineglimmer%20Snarl&format=image&version=normal', 'Vineglimmer Snarl')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/177972?lang=EN" target="_blank" class="card-link">Vineglimmer Snarl</a>
+                    </td>
+                    <td class="price-cell">¥80</td>
+                    <td class="price-cell">$0.49</td>
+                    <td class="total-cell">¥80</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en">EN</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-51" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-51" 
+                               data-qty="1" data-price="50" data-total="50"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/181056?lang=EN" 
+                               data-cardname="Gene Pollinator" data-imgurl="https://api.scryfall.com/cards/named?exact=Gene%20Pollinator&format=image&version=normal"
+                               data-lang="EN" data-note="" 
+                               data-isfoil="true" data-ckprice="0.49" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Gene%20Pollinator&format=image&version=normal" alt="Gene Pollinator" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Gene%20Pollinator&format=image&version=normal', 'Gene Pollinator')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/181056?lang=EN" target="_blank" class="card-link">Gene Pollinator</a>
+                    </td>
+                    <td class="price-cell">¥50</td>
+                    <td class="price-cell">$0.49</td>
+                    <td class="total-cell">¥50</td>
+                    <td class="lang-cell"><span class="lang-badge lang-en foil-badge">EN (Foil)</span></td>
+                    <td class="note-cell"></td>
+                </tr>
+                
+
+                <tr id="row-52" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-52" 
+                               data-qty="1" data-price="150" data-total="150"
+                               data-section="mainboard" data-sectionname="MAINBOARD" data-url="https://www.hareruyamtg.com/en/products/detail/74147?lang=JP" 
+                               data-cardname="Shared Summons" data-imgurl="https://api.scryfall.com/cards/named?exact=Shared%20Summons&format=image&version=normal"
+                               data-lang="JP" data-note="JP cheaper by ¥250" 
+                               data-isfoil="false" data-ckprice="0" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Shared%20Summons&format=image&version=normal" alt="Shared Summons" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Shared%20Summons&format=image&version=normal', 'Shared Summons')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/74147?lang=JP" target="_blank" class="card-link">Shared Summons</a>
+                    </td>
+                    <td class="price-cell">¥150</td>
+                    <td class="price-cell">---</td>
+                    <td class="total-cell">¥150</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">JP cheaper by ¥250</td>
+                </tr>
+                
+
+            </tbody>
+        </table>
+    </div>
+            
+
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">🃏 COMMANDER</h2>
+            <span class="section-total" id="section-commander-total">¥1,200</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th class="checkbox-cell"></th>
+                    <th class="img-cell">Image</th>
+                    <th class="qty-cell">Qty</th>
+                    <th class="name-cell">Card Name</th>
+                    <th class="price-cell">Hareruya</th>
+                    <th class="price-cell">Card Kingdom</th>
+                    <th class="total-cell">Subtotal</th>
+                    <th class="lang-cell">Lang</th>
+                    <th class="note-cell">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+
+                <tr id="row-53" class=" ">
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="checkbox" id="card-53" 
+                               data-qty="1" data-price="1200" data-total="1200"
+                               data-section="commander" data-sectionname="COMMANDER" data-url="https://www.hareruyamtg.com/en/products/detail/83734?lang=JP" 
+                               data-cardname="Kinnan, Bonder Prodigy" data-imgurl="https://api.scryfall.com/cards/named?exact=Kinnan%2C%20Bonder%20Prodigy&format=image&version=normal"
+                               data-lang="JP" data-note="JP cheaper by ¥800" 
+                               data-isfoil="false" data-ckprice="13.99" checked onchange="updateTotals()">
+                    </td>
+                    <td class="img-cell">
+                        <img src="https://api.scryfall.com/cards/named?exact=Kinnan%2C%20Bonder%20Prodigy&format=image&version=normal" alt="Kinnan, Bonder Prodigy" class="card-img" 
+                             onclick="showCardImage('https://api.scryfall.com/cards/named?exact=Kinnan%2C%20Bonder%20Prodigy&format=image&version=normal', 'Kinnan, Bonder Prodigy')" 
+                             onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                    </td>
+                    <td class="qty-cell">1x</td>
+                    <td class="name-cell">
+                        <a href="https://www.hareruyamtg.com/en/products/detail/83734?lang=JP" target="_blank" class="card-link">Kinnan, Bonder Prodigy</a>
+                    </td>
+                    <td class="price-cell">¥1,200</td>
+                    <td class="price-cell">$13.99</td>
+                    <td class="total-cell">¥1,200</td>
+                    <td class="lang-cell"><span class="lang-badge lang-jp">JP</span></td>
+                    <td class="note-cell">JP cheaper by ¥800</td>
+                </tr>
+                
+
+            </tbody>
+        </table>
+    </div>
+            
+
+    <div class="buy-later" id="buyLaterSection">
+        <h3>🛒 Buy Later</h3>
+        <p style="color: #666; font-size: 0.95em; margin: 5px 0 15px 0;">Cards you've unchecked will appear here</p>
+        <div id="buyLaterContent">
+            <p class="buy-later-empty">No cards marked for later purchase</p>
+        </div>
+    </div>
+        
+
+    <div class="grand-total">
+        <div class="grand-total-label">TOTAL DECK COST</div>
+        <div class="grand-total-value" id="grandTotal">¥15,890</div>
+    </div>
+        
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+        
+
+<script>
+function showCardImage(imgSrc, cardName) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    modalImg.src = imgSrc;
+    modalImg.alt = cardName;
+    modal.classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('imageModal').classList.remove('show');
+}
+
+function updateTotals() {
+    let grandTotal = 0;
+    let cardsIncluded = 0;
+    let outOfStockCount = 0;
+    const sections = {};
+    const buyLaterCards = [];
+    
+    document.querySelectorAll('.checkbox').forEach(checkbox => {
+        const row = document.getElementById('row-' + checkbox.id.split('-')[1]);
+        const section = checkbox.dataset.section;
+        const cardName = checkbox.dataset.cardname;
+        const qty = checkbox.dataset.qty;
+        const price = parseInt(checkbox.dataset.price) || 0;
+        const total = parseInt(checkbox.dataset.total) || 0;
+        
+        // Count out-of-stock cards
+        if (row.classList.contains('out-of-stock')) {
+            outOfStockCount++;
+        }
+        
+        if (checkbox.checked) {
+            row.classList.remove('excluded');
+            grandTotal += total;
+            if (total > 0) cardsIncluded++;
+            
+            if (!sections[section]) sections[section] = 0;
+            sections[section] += total;
+        } else {
+            row.classList.add('excluded');
+            // Add to buy later list
+            buyLaterCards.push({
+                name: cardName,
+                qty: qty,
+                price: price,
+                total: total,
+                url: checkbox.dataset.url,
+                imgUrl: checkbox.dataset.imgurl,
+                lang: checkbox.dataset.lang,
+                note: checkbox.dataset.note,
+                isFoil: checkbox.dataset.isfoil === 'true',
+                ckPrice: parseFloat(checkbox.dataset.ckprice) || 0,
+                sectionName: checkbox.dataset.sectionname
+            });
+        }
+    });
+    
+    // Update grand total
+    document.getElementById('grandTotal').textContent = '¥' + grandTotal.toLocaleString();
+    document.getElementById('cardsIncluded').textContent = cardsIncluded;
+    document.getElementById('outOfStock').textContent = outOfStockCount;
+    
+    // Update section totals
+    for (const [section, total] of Object.entries(sections)) {
+        const elem = document.getElementById('section-' + section + '-total');
+        if (elem) {
+            elem.textContent = '¥' + total.toLocaleString();
+        }
+    }
+    
+    // Update buy later section
+    const buyLaterContent = document.getElementById('buyLaterContent');
+    if (buyLaterCards.length === 0) {
+        buyLaterContent.innerHTML = '<p class="buy-later-empty">No cards marked for later purchase</p>';
+    } else {
+        const tableRows = buyLaterCards.map(card => {
+            const priceDisplay = card.price > 0 ? '¥' + card.price.toLocaleString() : '---';
+            const totalDisplay = card.total > 0 ? '¥' + card.total.toLocaleString() : '<span class="not-found">NOT FOUND</span>';
+            const ckDisplay = card.ckPrice > 0 ? '$' + card.ckPrice.toFixed(2) : '---';
+            const cardNameEscaped = card.name.replace(/'/g, '\'');
+            const langClass = card.lang === 'EN' || card.lang === 'JP' ? `lang-${card.lang.toLowerCase()}` : '';
+            const langDisplay = card.isFoil ? `${card.lang} (Foil)` : card.lang;
+            const sectionClass = card.sectionName ? card.sectionName.toLowerCase() : 'mainboard';
+            return `<tr>
+                <td class="img-cell">
+                    <img src="${card.imgUrl}" alt="${card.name}" class="card-img" 
+                         onclick="showCardImage('${card.imgUrl}', '${cardNameEscaped}')"
+                         onerror="this.src='https://via.placeholder.com/40x56?text=N/A'">
+                </td>
+                <td class="qty-cell">${card.qty}x</td>
+                <td class="name-cell">
+                    <a href="${card.url}" target="_blank" class="card-link">${card.name}</a>
+                    <span class="section-badge ${sectionClass}">${card.sectionName}</span>
+                </td>
+                <td class="price-cell">${priceDisplay}</td>
+                <td class="total-cell">${totalDisplay}</td>
+                <td class="lang-cell"><span class="lang-badge ${langClass}">${langDisplay}</span></td>
+                <td class="ck-cell">${ckDisplay}</td>
+                <td class="note-cell">${card.note}</td>
+            </tr>`;
+        }).join('');
+        buyLaterContent.innerHTML = `
+            <table class="buy-later-table">
+                <thead>
+                    <tr>
+                        <th class="img-cell">Image</th>
+                        <th class="qty-cell">Qty</th>
+                        <th class="name-cell">Card Name</th>
+                        <th class="price-cell">Hareruya</th>
+                        <th class="total-cell">Subtotal</th>
+                        <th class="lang-cell">Lang</th>
+                        <th class="ck-cell">Card Kingdom</th>
+                        <th class="note-cell">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>`;
+    }
+}
+
+function selectAll() {
+    document.querySelectorAll('.checkbox').forEach(cb => {
+        cb.checked = true;
+    });
+    updateTotals();
+}
+
+function deselectAll() {
+    document.querySelectorAll('.checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+    updateTotals();
+}
+
+function toggleFoundOnly() {
+    document.querySelectorAll('.checkbox').forEach(cb => {
+        const price = parseInt(cb.dataset.price) || 0;
+        cb.checked = price > 0;
+    });
+    updateTotals();
+}
+
+// Update totals when page loads to ensure accuracy
+window.addEventListener('DOMContentLoaded', function() {
+    updateTotals();
+});
+</script>
+</body>
+</html>
+        

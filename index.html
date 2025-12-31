@@ -286,10 +286,110 @@
         }
         
         @media (max-width: 768px) {
-            .header h1 { font-size: 1.8em; }
-            .deck-grid { grid-template-columns: 1fr; }
-            .buylist-table { font-size: 0.9em; }
-            .btn-refresh, .btn-delete { padding: 4px 8px; font-size: 0.8em; }
+            /* Container and layout */
+            .container {
+                padding: 10px;
+            }
+            
+            /* Header */
+            .header h1 { 
+                font-size: 1.5em; 
+                margin-bottom: 5px;
+            }
+            
+            .header p {
+                font-size: 0.9em;
+            }
+            
+            /* Section titles */
+            .section h2 {
+                font-size: 1.3em;
+                margin-bottom: 15px;
+            }
+            
+            /* Quick actions button */
+            .section a {
+                padding: 12px 30px !important;
+                font-size: 1em !important;
+            }
+            
+            /* Create buylist button */
+            .btn-create-buylist {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+            
+            /* Tables - make them horizontally scrollable */
+            .buylist-table {
+                font-size: 0.85em;
+                min-width: 700px; /* Force horizontal scroll for narrow screens */
+            }
+            
+            /* Wrap tables in scrollable container */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            /* Table cells */
+            .buylist-table th,
+            .buylist-table td {
+                padding: 8px 6px;
+                font-size: 0.9em;
+            }
+            
+            /* Action buttons */
+            .btn-refresh, 
+            .btn-delete,
+            .btn-view {
+                padding: 4px 8px;
+                font-size: 0.75em;
+                margin: 2px;
+            }
+            
+            /* Modal adjustments */
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+                padding: 15px;
+            }
+            
+            .modal-content h2 {
+                font-size: 1.3em;
+            }
+            
+            /* Checkbox items in modal */
+            .checkbox-item {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+            
+            /* Modal buttons */
+            .btn-primary,
+            .btn-secondary {
+                padding: 10px 20px;
+                font-size: 0.9em;
+                margin: 5px;
+            }
+            
+            /* Back to top button */
+            .back-to-top {
+                width: 45px;
+                height: 45px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 20px;
+            }
+            
+            /* Loading and empty states */
+            #buylists-loading,
+            #buylists-empty,
+            #deck-reports-loading,
+            #deck-reports-empty {
+                padding: 15px !important;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
