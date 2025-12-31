@@ -304,6 +304,10 @@
             background: #ffa500;
             color: white;
         }
+        .source-badge.buylist {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
         
         /* Filter Controls */
         .filter-controls {
@@ -952,8 +956,20 @@
             document.getElementById('totalCards').textContent = data.cards.length;
             
             const badge = document.getElementById('sourceBadge');
-            badge.textContent = (data.source || 'api').toUpperCase();
-            badge.className = `source-badge ${data.source || 'api'}`;
+            
+            // Show buylist-specific metadata if present
+            if (data.source === 'buylist' && data.metadata) {
+                badge.textContent = `BUYLIST (${data.metadata.deck_count} Decks)`;
+                badge.className = 'source-badge buylist';
+                
+                // Update description to show this is a consolidated list
+                const deckNameEl = document.getElementById('deckName');
+                deckNameEl.textContent = data.deckName;
+                deckNameEl.title = `Consolidated from deck IDs: ${data.metadata.deck_ids.join(', ')}`;
+            } else {
+                badge.textContent = (data.source || 'api').toUpperCase();
+                badge.className = `source-badge ${data.source || 'api'}`;
+            }
             
             // Update totals
             document.getElementById('hareruyaJpy').textContent = data.totals.hareruya_jpy.toLocaleString();
@@ -1266,12 +1282,45 @@
             }
         });
 
-        // Check for deck ID in URL parameters and load if present
+        // Check for deck ID or buylist ID in URL parameters and load if present
         async function loadDeckFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             const deckId = urlParams.get('deck');
+            const buylistId = urlParams.get('buylist');
             
-            if (deckId) {
+            if (buylistId) {
+                // Load buylist
+                showLoading('Loading buy list...');
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/buylists/${buylistId}`);
+                    if (!response.ok) throw new Error('Buy list not found');
+                    
+                    const data = await response.json();
+                    hideLoading();
+                    
+                    // Transform buylist data to deck format for display
+                    const transformedData = {
+                        deckName: `Buy List #${buylistId} (${data.deck_ids.length} Decks)`,
+                        deckId: `buylist-${buylistId}`,
+                        totalCards: data.cards.length,
+                        cards: data.cards,
+                        totals: data.totals,
+                        source: 'buylist',
+                        metadata: {
+                            created_at: data.created_at,
+                            deck_count: data.deck_ids.length,
+                            deck_ids: data.deck_ids
+                        }
+                    };
+                    
+                    // Display the results
+                    displayResults(transformedData);
+                } catch (error) {
+                    hideLoading();
+                    showError(`Failed to load buy list: ${error.message}`);
+                }
+            } else if (deckId) {
+                // Load single deck
                 showLoading('Loading deck...');
                 try {
                     const response = await fetch(`${CONFIG.API_BASE_URL}/api/decks/${deckId}`);
