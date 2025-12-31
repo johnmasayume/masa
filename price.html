@@ -286,6 +286,75 @@
             color: white;
         }
         
+        /* Filter Controls */
+        .filter-controls {
+            background: #1e3a5f;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filter-group label {
+            color: #67b5ff;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .filter-group select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            background: #0f3460;
+            color: #e0e0e0;
+            border: 1px solid #4a90e2;
+            cursor: pointer;
+        }
+        .mana-cost {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .mana-symbol {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .mana-w { background: #f0f0c0; color: #000; }
+        .mana-u { background: #0e68ab; color: #fff; }
+        .mana-b { background: #150b00; color: #fff; }
+        .mana-r { background: #d3202a; color: #fff; }
+        .mana-g { background: #00733e; color: #fff; }
+        .mana-c { background: #ccc; color: #000; }
+        .type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        .type-creature { background: #2d5016; color: #a8e6a3; }
+        .type-instant { background: #0e68ab; color: #b3d9ff; }
+        .type-sorcery { background: #5c3a21; color: #e8c39e; }
+        .type-enchantment { background: #4a0e4e; color: #e8b3ff; }
+        .type-artifact { background: #404040; color: #c0c0c0; }
+        .type-planeswalker { background: #5a4a3a; color: #ffd700; }
+        .type-land { background: #2a4a2a; color: #90ee90; }
+        
         /* Modal Styles */
         .modal {
             display: none;
@@ -578,10 +647,52 @@
                 </div>
             </div>
 
+            <div class="filter-controls" id="filterControls" style="display: none;">
+                <div class="filter-group">
+                    <label>Card Type</label>
+                    <select id="typeFilter" onchange="applyFilters()">
+                        <option value="all">All Types</option>
+                        <option value="Creature">Creatures</option>
+                        <option value="Instant">Instants</option>
+                        <option value="Sorcery">Sorceries</option>
+                        <option value="Enchantment">Enchantments</option>
+                        <option value="Artifact">Artifacts</option>
+                        <option value="Planeswalker">Planeswalkers</option>
+                        <option value="Land">Lands</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortFilter" onchange="applyFilters()">
+                        <option value="default">Default Order</option>
+                        <option value="cmc-asc">Mana Cost (Low to High)</option>
+                        <option value="cmc-desc">Mana Cost (High to Low)</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                        <option value="type">Card Type</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Color</label>
+                    <select id="colorFilter" onchange="applyFilters()">
+                        <option value="all">All Colors</option>
+                        <option value="W">White</option>
+                        <option value="U">Blue</option>
+                        <option value="B">Black</option>
+                        <option value="R">Red</option>
+                        <option value="G">Green</option>
+                        <option value="C">Colorless</option>
+                        <option value="multicolor">Multicolor</option>
+                    </select>
+                </div>
+            </div>
+            
             <table class="cards-table">
                 <thead>
                     <tr>
                         <th>Card</th>
+                        <th>Type</th>
+                        <th>Mana Cost</th>
                         <th>Qty</th>
                         <th>Hareruya (¥)</th>
                         <th>Hareruya ($)</th>
@@ -608,6 +719,10 @@
             API_BASE_URL: 'https://komei.theworkpc.com',
             STORAGE_KEY: 'hareruya_use_api'
         };
+        
+        // Global state for card data with metadata
+        let cardsData = [];
+        let currentDeckData = null;
 
         // Initialize toggle
         document.addEventListener('DOMContentLoaded', () => {
@@ -773,7 +888,9 @@
         }
 
         // Display results
-        function displayResults(data) {
+        async function displayResults(data) {
+            currentDeckData = data;
+            
             // Update header
             document.getElementById('deckName').textContent = data.name || data.deckName;
             document.getElementById('totalCards').textContent = data.cards.length;
@@ -787,9 +904,112 @@
             document.getElementById('hareruyaUsd').textContent = (data.totals.hareruya_usd || 0).toFixed(2);
             document.getElementById('cardKingdomUsd').textContent = (data.totals.cardkingdom_usd || 0).toFixed(2);
             
+            // Fetch card metadata from Scryfall
+            showLoading('Fetching card details...');
+            cardsData = await Promise.all(data.cards.map(async (card) => {
+                const metadata = await getCardMetadata(card.name);
+                return { ...card, metadata };
+            }));
+            hideLoading();
+            
+            // Show filter controls
+            document.getElementById('filterControls').style.display = 'flex';
+            
+            // Render cards
+            renderCards();
+            
+            showResults();
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Get card metadata from Scryfall
+        async function getCardMetadata(cardName) {
+            try {
+                const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return {
+                        image: data.image_uris?.small || data.card_faces?.[0]?.image_uris?.small || null,
+                        mana_cost: data.mana_cost || '',
+                        cmc: data.cmc || 0,
+                        type_line: data.type_line || '',
+                        colors: data.colors || [],
+                        primary_type: getPrimaryType(data.type_line || '')
+                    };
+                }
+            } catch (error) {
+                console.error(`Failed to fetch metadata for ${cardName}:`, error);
+            }
+            return { image: null, mana_cost: '', cmc: 0, type_line: '', colors: [], primary_type: 'Unknown' };
+        }
+        
+        // Extract primary card type
+        function getPrimaryType(typeLine) {
+            const types = ['Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Planeswalker', 'Land'];
+            for (const type of types) {
+                if (typeLine.includes(type)) return type;
+            }
+            return 'Other';
+        }
+        
+        // Render mana cost symbols
+        function renderManaCost(manaCost) {
+            if (!manaCost) return '<span class="mana-cost">—</span>';
+            const symbols = manaCost.match(/\{[^}]+\}/g) || [];
+            return `<span class="mana-cost">${symbols.map(symbol => {
+                const content = symbol.replace(/[{}]/g, '');
+                const colorClass = content.match(/[WUBRG]/) ? `mana-${content.toLowerCase()}` : 'mana-c';
+                return `<span class="mana-symbol ${colorClass}">${content}</span>`;
+            }).join('')}</span>`;
+        }
+        
+        // Apply filters and sorting
+        function applyFilters() {
+            renderCards();
+        }
+        
+        // Render cards with current filters
+        function renderCards() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            const colorFilter = document.getElementById('colorFilter').value;
+            
+            let filtered = [...cardsData];
+            
+            // Filter by type
+            if (typeFilter !== 'all') {
+                filtered = filtered.filter(card => card.metadata.primary_type === typeFilter);
+            }
+            
+            // Filter by color
+            if (colorFilter !== 'all') {
+                if (colorFilter === 'C') {
+                    filtered = filtered.filter(card => card.metadata.colors.length === 0);
+                } else if (colorFilter === 'multicolor') {
+                    filtered = filtered.filter(card => card.metadata.colors.length > 1);
+                } else {
+                    filtered = filtered.filter(card => card.metadata.colors.includes(colorFilter));
+                }
+            }
+            
+            // Sort
+            if (sortFilter === 'cmc-asc') {
+                filtered.sort((a, b) => (a.metadata.cmc || 0) - (b.metadata.cmc || 0));
+            } else if (sortFilter === 'cmc-desc') {
+                filtered.sort((a, b) => (b.metadata.cmc || 0) - (a.metadata.cmc || 0));
+            } else if (sortFilter === 'name-asc') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortFilter === 'name-desc') {
+                filtered.sort((a, b) => b.name.localeCompare(a.name));
+            } else if (sortFilter === 'type') {
+                filtered.sort((a, b) => a.metadata.primary_type.localeCompare(b.metadata.primary_type));
+            }
+            
             // Update cards table
             const tbody = document.getElementById('cardsTableBody');
-            tbody.innerHTML = data.cards.map((card, index) => {
+            tbody.innerHTML = filtered.map((card, index) => {
                 // Handle both nested and flat structures
                 const hareruyaData = card.hareruya || {};
                 const ckData = card.cardkingdom || {};
@@ -800,17 +1020,24 @@
                 const hareruyaStock = hareruyaData.stock || 0;
                 
                 const isOutOfStock = hareruyaStock === 0;
+                const primaryType = card.metadata.primary_type || 'Unknown';
+                const typeClass = primaryType.toLowerCase();
                 
                 return `
                     <tr>
                         <td>
                             <div class="card-cell">
-                                <img class="card-image loading" id="cardImg${index}" alt="${card.name}" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')"
-                                     style="cursor: pointer;" title="Click for details">
-                                <span class="card-name" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')"
-                                      title="Click for details">${card.name}</span>
+                                ${card.metadata.image ? 
+                                    `<img class="card-image" src="${card.metadata.image}" alt="${card.name}" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')" style="cursor: pointer;" title="Click for details">` :
+                                    `<div class="card-image loading"></div>`
+                                }
+                                <span class="card-name" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')" title="Click for details">${card.name}</span>
                             </div>
                         </td>
+                        <td>
+                            <span class="type-badge type-${typeClass}">${primaryType}</span>
+                        </td>
+                        <td>${renderManaCost(card.metadata.mana_cost)}</td>
                         <td>${card.quantity}</td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
                             ${hareruyaJpy ? '¥' + hareruyaJpy : '-'}
@@ -823,23 +1050,6 @@
                     </tr>
                 `;
             }).join('');
-            
-            showResults();
-            
-            // Fetch card images asynchronously
-            data.cards.forEach(async (card, index) => {
-                const imageUrl = await getCardImage(card.name);
-                const imgElement = document.getElementById(`cardImg${index}`);
-                if (imgElement && imageUrl) {
-                    imgElement.src = imageUrl;
-                    imgElement.classList.remove('loading');
-                } else if (imgElement) {
-                    imgElement.style.display = 'none';
-                }
-            });
-            
-            // Scroll to results
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Card Modal Functions
