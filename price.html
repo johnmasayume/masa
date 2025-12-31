@@ -288,6 +288,25 @@
             background: #4a1f1f;
             color: #ff6b6b;
         }
+        .lang-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .lang-badge.lang-en {
+            background: #1e4a7a;
+            color: #4a9eff;
+        }
+        .lang-badge.lang-jp {
+            background: #4a1e1e;
+            color: #ff7a7a;
+        }
+        .lang-badge.lang-unknown {
+            background: #3a3a3a;
+            color: #888;
+        }
         .source-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -722,9 +741,6 @@
                 <h2 class="deck-name" id="deckName"></h2>
                 <p>Total Cards: <strong id="totalCards"></strong></p>
                 <p>Source: <span class="source-badge" id="sourceBadge"></span></p>
-                <button class="btn" id="refreshBuylistBtn" style="display: none; margin-top: 10px;" onclick="refreshBuylist()">
-                    🔄 Refresh Buy List
-                </button>
             </div>
 
             <div class="totals-grid">
@@ -794,6 +810,7 @@
                         <th>Type</th>
                         <th>Mana Cost</th>
                         <th>Qty</th>
+                        <th>Lang</th>
                         <th>Hareruya (¥)</th>
                         <th>Hareruya ($)</th>
                         <th>Card Kingdom ($)</th>
@@ -1055,7 +1072,6 @@
             document.getElementById('totalCards').textContent = data.totalCards || data.cards.length;
             
             const badge = document.getElementById('sourceBadge');
-            const refreshBtn = document.getElementById('refreshBuylistBtn');
             
             // Show buylist-specific metadata if present
             if (data.source === 'buylist' && data.metadata) {
@@ -1066,15 +1082,9 @@
                 const deckNameEl = document.getElementById('deckName');
                 deckNameEl.textContent = data.deckName;
                 deckNameEl.title = `Consolidated from deck IDs: ${data.metadata.deck_ids.join(', ')}`;
-                
-                // Show refresh button for buylists
-                refreshBtn.style.display = 'inline-block';
             } else {
                 badge.textContent = (data.source || 'api').toUpperCase();
                 badge.className = `source-badge ${data.source || 'api'}`;
-                
-                // Hide refresh button for regular decks
-                refreshBtn.style.display = 'none';
             }
             
             // Update totals
@@ -1225,6 +1235,8 @@
                 const hareruyaUsd = hareruyaData.price_usd || 0;
                 const ckUsd = ckData.price_usd || 0;
                 const hareruyaStock = hareruyaData.stock || 0;
+                const hareruyaLang = hareruyaData.language || 'N/A';
+                const hareruyaUrl = hareruyaData.product_url || '';
                 
                 const isOutOfStock = hareruyaStock === 0;
                 const stockStatus = hareruyaStock > 0 ? 
@@ -1232,6 +1244,14 @@
                     '<span class="stock-badge unavailable">✗ Out of Stock</span>';
                 const primaryType = card.metadata.primary_type || 'Unknown';
                 const typeClass = primaryType.toLowerCase();
+                
+                // Language badge styling
+                const langClass = hareruyaLang === 'EN' ? 'lang-en' : (hareruyaLang === 'JP' ? 'lang-jp' : 'lang-unknown');
+                const langBadge = hareruyaLang !== 'N/A' ? `<span class="lang-badge ${langClass}">${hareruyaLang}</span>` : '-';
+                
+                // Make prices clickable if URL exists
+                const jpyPrice = hareruyaJpy ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener" style="color: #4a9eff; text-decoration: none;">¥${hareruyaJpy}</a>` : `¥${hareruyaJpy}`) : '-';
+                const usdPrice = hareruyaUsd ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener" style="color: #4a9eff; text-decoration: none;">$${hareruyaUsd.toFixed(2)}</a>` : `$${hareruyaUsd.toFixed(2)}`) : '-';
                 
                 return `
                     <tr>
@@ -1249,11 +1269,12 @@
                         </td>
                         <td>${renderManaCost(card.metadata.mana_cost)}</td>
                         <td>${card.quantity}</td>
+                        <td>${langBadge}</td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
-                            ${hareruyaJpy ? '¥' + hareruyaJpy : '-'}
+                            ${jpyPrice}
                         </td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
-                            ${hareruyaUsd ? '$' + hareruyaUsd.toFixed(2) : '-'}
+                            ${usdPrice}
                         </td>
                         <td>${ckUsd ? '$' + ckUsd.toFixed(2) : '-'}</td>
                         <td>${stockStatus}</td>

@@ -589,6 +589,9 @@
                                 <td>${buylist.total_cards} cards</td>
                                 <td>${formattedDate}</td>
                                 <td>
+                                    <button class="btn-refresh" onclick="refreshBuyList('${buylist.id}')" title="Refresh with latest prices">
+                                        🔄 Refresh
+                                    </button>
                                     <button class="btn-delete" onclick="deleteBuyList('${buylist.id}')" title="Delete this buy list">
                                         🗑️ Delete
                                     </button>
@@ -687,6 +690,63 @@
                 
                 setTimeout(() => {
                     updateCreateButton();
+                }, 3000);
+            }
+        }
+        
+        async function refreshBuyList(buylistId) {
+            const row = document.getElementById(`buylist-row-${buylistId}`);
+            const button = row.querySelector('.btn-refresh');
+            
+            button.disabled = true;
+            button.innerHTML = '⏳ Refreshing...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/buylists/${buylistId}`, {
+                    method: 'PUT'
+                });
+                
+                if (!response.ok) throw new Error('Failed to refresh buy list');
+                
+                const data = await response.json();
+                
+                // Update the date in the row
+                const dateCell = row.cells[3];
+                const utcString = data.generated_at.endsWith('Z') ? data.generated_at : data.generated_at + 'Z';
+                const newDate = new Date(utcString);
+                const year = newDate.getFullYear();
+                const month = String(newDate.getMonth() + 1).padStart(2, '0');
+                const day = String(newDate.getDate()).padStart(2, '0');
+                const hours = String(newDate.getHours()).padStart(2, '0');
+                const minutes = String(newDate.getMinutes()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+                dateCell.textContent = formattedDate;
+                
+                // Update total cards count
+                const cardsCell = row.cells[2];
+                cardsCell.textContent = `${data.total_cards} cards`;
+                
+                // Show success feedback
+                button.innerHTML = '✓ Updated!';
+                button.style.background = 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)';
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = '🔄 Refresh';
+                    button.style.background = '';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error refreshing buy list:', error);
+                button.innerHTML = '❌ Failed';
+                button.style.background = 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)';
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = '🔄 Refresh';
+                    button.style.background = '';
                 }, 3000);
             }
         }
