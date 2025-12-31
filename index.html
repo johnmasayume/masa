@@ -201,7 +201,9 @@
                     empty.style.display = 'block';
                 } else {
                     tbody.innerHTML = data.items.map(deck => {
-                        const date = new Date(deck.generated_at);
+                        // Backend sends UTC time without 'Z', so append it for proper parsing
+                        const utcString = deck.generated_at.endsWith('Z') ? deck.generated_at : deck.generated_at + 'Z';
+                        const date = new Date(utcString);
                         // ISO style: YYYY-MM-DD HH:MM with timezone
                         const year = date.getFullYear();
                         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -264,7 +266,9 @@
                 
                 // Update the date in the row
                 const dateCell = row.cells[1];
-                const newDate = new Date(data.generated_at);
+                // Backend sends UTC time without 'Z', so append it for proper parsing
+                const utcString = data.generated_at.endsWith('Z') ? data.generated_at : data.generated_at + 'Z';
+                const newDate = new Date(utcString);
                 const year = newDate.getFullYear();
                 const month = String(newDate.getMonth() + 1).padStart(2, '0');
                 const day = String(newDate.getDate()).padStart(2, '0');
