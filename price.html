@@ -911,6 +911,14 @@
                         <option value="name-asc">Name (A-Z)</option>
                         <option value="name-desc">Name (Z-A)</option>
                         <option value="type">Card Type</option>
+                        <option value="qty-asc">Quantity (Low to High)</option>
+                        <option value="qty-desc">Quantity (High to Low)</option>
+                        <option value="price-jpy-asc">Hareruya ¥ (Low to High)</option>
+                        <option value="price-jpy-desc">Hareruya ¥ (High to Low)</option>
+                        <option value="price-usd-asc">Hareruya $ (Low to High)</option>
+                        <option value="price-usd-desc">Hareruya $ (High to Low)</option>
+                        <option value="price-ck-asc">Card Kingdom $ (Low to High)</option>
+                        <option value="price-ck-desc">Card Kingdom $ (High to Low)</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -1351,6 +1359,22 @@
                 filtered.sort((a, b) => b.name.localeCompare(a.name));
             } else if (sortFilter === 'type') {
                 filtered.sort((a, b) => a.metadata.primary_type.localeCompare(b.metadata.primary_type));
+            } else if (sortFilter === 'qty-asc') {
+                filtered.sort((a, b) => (a.quantity || 0) - (b.quantity || 0));
+            } else if (sortFilter === 'qty-desc') {
+                filtered.sort((a, b) => (b.quantity || 0) - (a.quantity || 0));
+            } else if (sortFilter === 'price-jpy-asc') {
+                filtered.sort((a, b) => ((a.hareruya?.price_jpy || 0) - (b.hareruya?.price_jpy || 0)));
+            } else if (sortFilter === 'price-jpy-desc') {
+                filtered.sort((a, b) => ((b.hareruya?.price_jpy || 0) - (a.hareruya?.price_jpy || 0)));
+            } else if (sortFilter === 'price-usd-asc') {
+                filtered.sort((a, b) => ((a.hareruya?.price_usd || 0) - (b.hareruya?.price_usd || 0)));
+            } else if (sortFilter === 'price-usd-desc') {
+                filtered.sort((a, b) => ((b.hareruya?.price_usd || 0) - (a.hareruya?.price_usd || 0)));
+            } else if (sortFilter === 'price-ck-asc') {
+                filtered.sort((a, b) => ((a.cardkingdom?.price_usd || 0) - (b.cardkingdom?.price_usd || 0)));
+            } else if (sortFilter === 'price-ck-desc') {
+                filtered.sort((a, b) => ((b.cardkingdom?.price_usd || 0) - (a.cardkingdom?.price_usd || 0)));
             }
             
             // Update cards table
