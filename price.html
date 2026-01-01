@@ -225,6 +225,14 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
+        /* Hide sources column by default */
+        .sources-column {
+            display: none;
+        }
+        /* Show sources column when body has buylist class */
+        body.viewing-buylist .sources-column {
+            display: table-cell;
+        }
         .cards-table th {
             background: #2a2a2a;
             color: #60a5fa;
@@ -952,7 +960,7 @@
                             <th>Type</th>
                             <th>Mana Cost</th>
                             <th>Qty</th>
-                            <th id="sourcesColumnHeader" style="display: none;">Sources</th>
+                            <th class="sources-column">Sources</th>
                             <th>Lang</th>
                             <th>Hareruya (¥)</th>
                             <th>Hareruya ($)</th>
@@ -1255,10 +1263,11 @@
             
             // Show/hide and populate source filter for buylists
             const deckSourceFilter = document.getElementById('deckSourceFilter');
-            const sourcesColumnHeader = document.getElementById('sourcesColumnHeader');
             if (data.source === 'buylist' && data.metadata && data.metadata.deck_names) {
+                // Add class to body to show sources column
+                document.body.classList.add('viewing-buylist');
+                
                 deckSourceFilter.style.display = 'flex';
-                sourcesColumnHeader.style.display = '';
                 
                 // Populate source filter dropdown
                 const sourceFilter = document.getElementById('sourceFilter');
@@ -1270,8 +1279,9 @@
                     sourceFilter.appendChild(option);
                 });
             } else {
+                // Remove class from body to hide sources column
+                document.body.classList.remove('viewing-buylist');
                 deckSourceFilter.style.display = 'none';
-                sourcesColumnHeader.style.display = 'none';
             }
             
             // Render cards
@@ -1445,12 +1455,10 @@
                 const usdPrice = hareruyaUsd ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener" style="color: #4a9eff; text-decoration: none;">$${hareruyaUsd.toFixed(2)}</a>` : `$${hareruyaUsd.toFixed(2)}`) : '-';
                 
                 // Build sources display (for buylists)
-                let sourcesCell = '';
-                if (card.sources && Array.isArray(card.sources) && card.sources.length > 0) {
-                    const sourcesList = card.sources.map(s => `${s.deck_name} (${s.quantity})`).join('<br>');
-                    sourcesCell = `<td style="font-size: 0.85em; line-height: 1.4;">${sourcesList}</td>`;
-                } else {
-                    sourcesCell = `<td style="display: ${currentDeckData.source === 'buylist' ? '' : 'none'};">-</td>`;
+                const isBuylist = currentDeckData.source === 'buylist';
+                let sourcesContent = '-';
+                if (isBuylist && card.sources && Array.isArray(card.sources) && card.sources.length > 0) {
+                    sourcesContent = card.sources.map(s => `${s.deck_name} (${s.quantity})`).join('<br>');
                 }
                 
                 return `
@@ -1469,7 +1477,7 @@
                         </td>
                         <td>${renderManaCost(card.metadata.mana_cost)}</td>
                         <td>${card.quantity}</td>
-                        ${sourcesCell}
+                        <td class="sources-column" style="font-size: 0.85em; line-height: 1.4;">${sourcesContent}</td>
                         <td>${langBadge}${foilBadge}</td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
                             ${jpyPrice}
