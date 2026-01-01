@@ -934,6 +934,12 @@
                         <option value="multicolor">Multicolor</option>
                     </select>
                 </div>
+                <div class="filter-group" id="deckSourceFilter" style="display: none;">
+                    <label>Source Deck</label>
+                    <select id="sourceFilter" onchange="applyFilters()">
+                        <option value="all">All Decks</option>
+                    </select>
+                </div>
             </div>
             
             <div id="resultsCount" style="color: #b0b0b0; margin-bottom: 10px; display: none;"></div>
@@ -946,6 +952,7 @@
                             <th>Type</th>
                             <th>Mana Cost</th>
                             <th>Qty</th>
+                            <th id="sourcesColumnHeader" style="display: none;">Sources</th>
                             <th>Lang</th>
                             <th>Hareruya (¥)</th>
                             <th>Hareruya ($)</th>
@@ -1246,6 +1253,27 @@
             // Show filter controls
             document.getElementById('filterControls').style.display = 'flex';
             
+            // Show/hide and populate source filter for buylists
+            const deckSourceFilter = document.getElementById('deckSourceFilter');
+            const sourcesColumnHeader = document.getElementById('sourcesColumnHeader');
+            if (data.source === 'buylist' && data.metadata && data.metadata.deck_names) {
+                deckSourceFilter.style.display = 'flex';
+                sourcesColumnHeader.style.display = '';
+                
+                // Populate source filter dropdown
+                const sourceFilter = document.getElementById('sourceFilter');
+                sourceFilter.innerHTML = '<option value="all">All Decks</option>';
+                data.metadata.deck_names.forEach((deckName, index) => {
+                    const option = document.createElement('option');
+                    option.value = data.metadata.deck_ids[index];
+                    option.textContent = deckName;
+                    sourceFilter.appendChild(option);
+                });
+            } else {
+                deckSourceFilter.style.display = 'none';
+                sourcesColumnHeader.style.display = 'none';
+            }
+            
             // Render cards
             renderCards();
             
@@ -1321,8 +1349,16 @@
             const typeFilter = document.getElementById('typeFilter').value;
             const sortFilter = document.getElementById('sortFilter').value;
             const colorFilter = document.getElementById('colorFilter').value;
+            const sourceFilter = document.getElementById('sourceFilter')?.value || 'all';
             
             let filtered = [...cardsData];
+            
+            // Filter by source deck (for buylists only)
+            if (sourceFilter !== 'all' && currentDeckData.source === 'buylist') {
+                filtered = filtered.filter(card => {
+                    return card.sources && card.sources.some(s => s.deck_id === sourceFilter);
+                });
+            }
             
             // Search filter
             if (searchQuery) {
@@ -1408,6 +1444,15 @@
                 const jpyPrice = hareruyaJpy ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener" style="color: #4a9eff; text-decoration: none;">¥${hareruyaJpy}</a>` : `¥${hareruyaJpy}`) : '-';
                 const usdPrice = hareruyaUsd ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener" style="color: #4a9eff; text-decoration: none;">$${hareruyaUsd.toFixed(2)}</a>` : `$${hareruyaUsd.toFixed(2)}`) : '-';
                 
+                // Build sources display (for buylists)
+                let sourcesCell = '';
+                if (card.sources && Array.isArray(card.sources) && card.sources.length > 0) {
+                    const sourcesList = card.sources.map(s => `${s.deck_name} (${s.quantity})`).join('<br>');
+                    sourcesCell = `<td style="font-size: 0.85em; line-height: 1.4;">${sourcesList}</td>`;
+                } else {
+                    sourcesCell = `<td style="display: ${currentDeckData.source === 'buylist' ? '' : 'none'};">-</td>`;
+                }
+                
                 return `
                     <tr>
                         <td>
@@ -1424,6 +1469,7 @@
                         </td>
                         <td>${renderManaCost(card.metadata.mana_cost)}</td>
                         <td>${card.quantity}</td>
+                        ${sourcesCell}
                         <td>${langBadge}${foilBadge}</td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
                             ${jpyPrice}
