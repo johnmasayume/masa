@@ -956,6 +956,7 @@
                 <table class="cards-table">
                     <thead>
                         <tr>
+                            <th style="width: 40px;"><input type="checkbox" id="selectAllCards" checked onchange="toggleAllCards(this.checked)" title="Select/Unselect All"></th>
                             <th>Card</th>
                             <th>Type</th>
                             <th>Mana Cost</th>
@@ -971,6 +972,32 @@
                     <tbody id="cardsTableBody">
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Buy Later Section -->
+            <div id="buyLaterSection" style="display: none; margin-top: 30px;">
+                <h3 style="color: #999; font-size: 1.3em; margin-bottom: 15px;">📋 Buy Later</h3>
+                <div class="cards-table-container">
+                    <table class="cards-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"><input type="checkbox" id="selectAllBuyLater" onchange="toggleAllBuyLater(this.checked)" title="Select/Unselect All"></th>
+                                <th>Card</th>
+                                <th>Type</th>
+                                <th>Mana Cost</th>
+                                <th>Qty</th>
+                                <th class="sources-column">Sources</th>
+                                <th>Lang</th>
+                                <th>Hareruya (¥)</th>
+                                <th>Hareruya ($)</th>
+                                <th>Card Kingdom ($)</th>
+                                <th>Availability</th>
+                            </tr>
+                        </thead>
+                        <tbody id="buyLaterTableBody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -995,6 +1022,7 @@
         // Global state for card data with metadata
         let cardsData = [];
         let currentDeckData = null;
+        let cardSelections = {}; // Track which cards are selected/deselected
 
         // Initialize toggle
         document.addEventListener('DOMContentLoaded', () => {
@@ -1254,6 +1282,10 @@
             showLoading('Fetching card details...');
             cardsData = await Promise.all(data.cards.map(async (card) => {
                 const metadata = await getCardMetadata(card.name);
+                // Initialize all cards as selected by default
+                if (cardSelections[card.name] === undefined) {
+                    cardSelections[card.name] = true;
+                }
                 return { ...card, metadata };
             }));
             hideLoading();
@@ -1425,7 +1457,47 @@
             
             // Update cards table
             const tbody = document.getElementById('cardsTableBody');
-            tbody.innerHTML = filtered.map((card, index) => {
+            const buyLaterBody = document.getElementById('buyLaterTableBody');
+            
+            // Split cards into selected (buy now) and unselected (buy later)
+            const selectedCards = filtered.filter(card => cardSelections[card.name] !== false);
+            const unselectedCards = filtered.filter(card => cardSelections[card.name] === false);
+            
+            // Render selected cards in main table
+            tbody.innerHTML = selectedCards.map((card, index) => {
+                return renderCardRow(card, index, true);
+            }).join('');
+            
+            // Render unselected cards in buy later table
+            buyLaterBody.innerHTML = unselectedCards.map((card, index) => {
+                return renderCardRow(card, index, false);
+            }).join('');
+            
+            // Show/hide Buy Later section
+            const buyLaterSection = document.getElementById('buyLaterSection');
+            if (unselectedCards.length > 0) {
+                buyLaterSection.style.display = 'block';
+            } else {
+                buyLaterSection.style.display = 'none';
+            }
+            
+            // Update totals based on selected cards
+            updateTotals(selectedCards);
+            
+            // Update results count
+            const resultsCount = document.getElementById('resultsCount');
+            if (resultsCount) {
+                if (filtered.length !== cardsData.length) {
+                    resultsCount.textContent = `Showing ${filtered.length} of ${cardsData.length} cards`;
+                    resultsCount.style.display = 'block';
+                } else {
+                    resultsCount.style.display = 'none';
+                }
+            }
+        }
+        
+        // Render a single card row
+        function renderCardRow(card, index, isSelected) {
                 // Handle both nested and flat structures
                 const hareruyaData = card.hareruya || {};
                 const ckData = card.cardkingdom || {};
@@ -1463,6 +1535,9 @@
                 
                 return `
                     <tr>
+                        <td style="text-align: center;">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleCard('${card.name.replace(/'/g, "\\'")}', this.checked)" title="Include in purchase">
+                        </td>
                         <td>
                             <div class="card-cell">
                                 ${card.metadata.image ? 
@@ -1489,18 +1564,65 @@
                         <td>${stockStatus}</td>
                     </tr>
                 `;
-            }).join('');
-            
-            // Update results count
-            const resultsCount = document.getElementById('resultsCount');
-            if (resultsCount) {
-                if (filtered.length !== cardsData.length) {
-                    resultsCount.textContent = `Showing ${filtered.length} of ${cardsData.length} cards`;
-                    resultsCount.style.display = 'block';
-                } else {
-                    resultsCount.style.display = 'none';
+        }
+        
+        // Toggle card selection
+        function toggleCard(cardName, isChecked) {
+            cardSelections[cardName] = isChecked;
+            renderCards();
+        }
+        
+        // Toggle all cards in main table
+        function toggleAllCards(isChecked) {
+            const tbody = document.getElementById('cardsTableBody');
+            const checkboxes = tbody.querySelectorAll('input[type="checkbox"]');
+            cardsData.forEach(card => {
+                if (cardSelections[card.name] !== false) {
+                    cardSelections[card.name] = isChecked;
                 }
-            }
+            });
+            renderCards();
+        }
+        
+        // Toggle all cards in buy later table
+        function toggleAllBuyLater(isChecked) {
+            cardsData.forEach(card => {
+                if (cardSelections[card.name] === false) {
+                    cardSelections[card.name] = isChecked;
+                }
+            });
+            renderCards();
+        }
+        
+        // Update totals based on selected cards
+        function updateTotals(selectedCards) {
+            let totalHareruyaJpy = 0;
+            let totalHareruyaUsd = 0;
+            let totalCkUsd = 0;
+            
+            selectedCards.forEach(card => {
+                const hareruyaData = card.hareruya || {};
+                const ckData = card.cardkingdom || {};
+                const qty = card.quantity || 1;
+                
+                const hareruyaJpy = hareruyaData.price_jpy || 0;
+                const hareruyaUsd = hareruyaData.price_usd || 0;
+                const ckUsd = ckData.price_usd || 0;
+                
+                // Only add if in stock
+                if ((hareruyaData.stock || 0) > 0) {
+                    totalHareruyaJpy += hareruyaJpy * qty;
+                    totalHareruyaUsd += hareruyaUsd * qty;
+                }
+                if (ckUsd > 0) {
+                    totalCkUsd += ckUsd * qty;
+                }
+            });
+            
+            // Update display
+            document.getElementById('hareruyaJpy').textContent = totalHareruyaJpy.toLocaleString();
+            document.getElementById('hareruyaUsd').textContent = totalHareruyaUsd.toFixed(2);
+            document.getElementById('cardKingdomUsd').textContent = totalCkUsd.toFixed(2);
         }
 
         // Card Modal Functions
