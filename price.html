@@ -313,6 +313,17 @@
             background: #3a3a3a;
             color: #888;
         }
+        .foil-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            color: #000;
+            margin-left: 4px;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+        }
         .source-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -753,6 +764,11 @@
             .lang-badge {
                 font-size: 0.7em;
                 padding: 2px 6px;
+            }
+            
+            .foil-badge {
+                font-size: 0.65em;
+                padding: 2px 4px;
             }
             
             .stock-badge {
@@ -1350,6 +1366,7 @@
                 const hareruyaStock = hareruyaData.stock || 0;
                 const hareruyaLang = hareruyaData.language || 'N/A';
                 const hareruyaUrl = hareruyaData.product_url || '';
+                const isFoil = hareruyaData.foil || false;
                 
                 const isOutOfStock = hareruyaStock === 0;
                 const stockStatus = hareruyaStock > 0 ? 
@@ -1361,6 +1378,7 @@
                 // Language badge styling
                 const langClass = hareruyaLang === 'EN' ? 'lang-en' : (hareruyaLang === 'JP' ? 'lang-jp' : 'lang-unknown');
                 const langBadge = hareruyaLang !== 'N/A' ? `<span class="lang-badge ${langClass}">${hareruyaLang}</span>` : '-';
+                const foilBadge = isFoil ? '<span class="foil-badge">✨ FOIL</span>' : '';
                 
                 // Make prices clickable if URL exists
                 const jpyPrice = hareruyaJpy ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener" style="color: #4a9eff; text-decoration: none;">¥${hareruyaJpy}</a>` : `¥${hareruyaJpy}`) : '-';
@@ -1382,7 +1400,7 @@
                         </td>
                         <td>${renderManaCost(card.metadata.mana_cost)}</td>
                         <td>${card.quantity}</td>
-                        <td>${langBadge}</td>
+                        <td>${langBadge}${foilBadge}</td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
                             ${jpyPrice}
                         </td>
