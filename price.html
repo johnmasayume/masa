@@ -1981,9 +1981,11 @@
             const isOutOfStock = hareruyaStock === 0;
             const stockClass = isOutOfStock ? 'out-of-stock' : '';
             
-            // Get card metadata
-            const imageUrl = card.metadata?.image_uris?.small || card.metadata?.image_uris?.normal || 
-                            (card.metadata?.card_faces?.[0]?.image_uris?.small) || 
+            // Get card metadata - check both formats (image string or image_uris object)
+            const imageUrl = card.metadata?.image || 
+                            card.metadata?.image_uris?.small || 
+                            card.metadata?.image_uris?.normal || 
+                            card.metadata?.card_faces?.[0]?.image_uris?.small || 
                             'https://via.placeholder.com/200x280?text=No+Image';
             
             const manaSymbols = card.metadata?.mana_cost || '';
