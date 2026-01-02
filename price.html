@@ -332,6 +332,30 @@
             margin-left: 4px;
             box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
         }
+        .save-changes-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s ease;
+        }
+        .save-changes-btn:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        .save-changes-btn:active {
+            transform: translateY(0);
+        }
+        .save-changes-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .source-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -889,6 +913,14 @@
                     <p class="price">$<span id="cardKingdomUsd">0.00</span></p>
                 </div>
             </div>
+            
+            <!-- Save Changes Button -->
+            <div style="text-align: center; margin: 20px 0;">
+                <button id="saveChangesBtn" class="save-changes-btn" onclick="saveCardStates()" style="display: none;">
+                    💾 Save Changes
+                </button>
+                <span id="saveStatus" style="margin-left: 10px; color: #4ade80;"></span>
+            </div>
 
             <div class="filter-controls" id="filterControls" style="display: none;">
                 <div class="filter-group search-clear">
@@ -957,6 +989,7 @@
                     <thead>
                         <tr>
                             <th style="width: 40px;"><input type="checkbox" id="selectAllCards" checked onchange="toggleAllCards(this.checked)" title="Select/Unselect All"></th>
+                            <th style="width: 60px;">Purchased</th>
                             <th>Card</th>
                             <th>Type</th>
                             <th>Mana Cost</th>
@@ -982,6 +1015,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 40px;"><input type="checkbox" id="selectAllBuyLater" onchange="toggleAllBuyLater(this.checked)" title="Select/Unselect All"></th>
+                                <th style="width: 60px;">Purchased</th>
                                 <th>Card</th>
                                 <th>Type</th>
                                 <th>Mana Cost</th>
@@ -1023,6 +1057,7 @@
         let cardsData = [];
         let currentDeckData = null;
         let cardSelections = {}; // Track which cards are selected/deselected
+        let cardPurchased = {}; // Track which cards have been purchased
 
         // Initialize toggle
         document.addEventListener('DOMContentLoaded', () => {
@@ -1282,13 +1317,26 @@
             showLoading('Fetching card details...');
             cardsData = await Promise.all(data.cards.map(async (card) => {
                 const metadata = await getCardMetadata(card.name);
-                // Initialize all cards as selected by default
+                
+                // Load saved selection state from backend or default to true
                 if (cardSelections[card.name] === undefined) {
-                    cardSelections[card.name] = true;
+                    cardSelections[card.name] = card.selected !== undefined ? card.selected : true;
                 }
+                
+                // Load saved purchased state from backend or default to false
+                if (cardPurchased[card.name] === undefined) {
+                    cardPurchased[card.name] = card.purchased || false;
+                }
+                
                 return { ...card, metadata };
             }));
             hideLoading();
+            
+            // Show save button if using API mode
+            const useApi = localStorage.getItem(CONFIG.STORAGE_KEY) === 'true';
+            if (useApi) {
+                document.getElementById('saveChangesBtn').style.display = 'none'; // Hidden until changes made
+            }
             
             // Show filter controls
             document.getElementById('filterControls').style.display = 'flex';
@@ -1509,6 +1557,7 @@
                 const hareruyaLang = hareruyaData.language || 'N/A';
                 const hareruyaUrl = hareruyaData.product_url || '';
                 const isFoil = hareruyaData.foil || false;
+                const isPurchased = cardPurchased[card.name] || false;
                 
                 const isOutOfStock = hareruyaStock === 0;
                 const stockStatus = hareruyaStock > 0 ? 
@@ -1533,10 +1582,16 @@
                     sourcesContent = card.sources.map(s => `${s.deck_name} (${s.quantity})`).join('<br>');
                 }
                 
+                // Add purchased styling
+                const purchasedStyle = isPurchased ? 'style="opacity: 0.5; text-decoration: line-through;"' : '';
+                
                 return `
-                    <tr>
+                    <tr ${purchasedStyle}>
                         <td style="text-align: center;">
                             <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleCard('${card.name.replace(/'/g, "\\'")}', this.checked)" title="Include in purchase">
+                        </td>
+                        <td style="text-align: center;">
+                            <input type="checkbox" ${isPurchased ? 'checked' : ''} onchange="togglePurchased('${card.name.replace(/'/g, "\\'")}', this.checked)" title="Mark as purchased">
                         </td>
                         <td>
                             <div class="card-cell">
@@ -1570,6 +1625,16 @@
         function toggleCard(cardName, isChecked) {
             cardSelections[cardName] = isChecked;
             renderCards();
+            // Show save button when changes are made
+            document.getElementById('saveChangesBtn').style.display = 'inline-block';
+        }
+        
+        // Toggle card purchased state
+        function togglePurchased(cardName, isChecked) {
+            cardPurchased[cardName] = isChecked;
+            renderCards();
+            // Show save button when changes are made
+            document.getElementById('saveChangesBtn').style.display = 'inline-block';
         }
         
         // Toggle all cards in main table
@@ -1594,13 +1659,18 @@
             renderCards();
         }
         
-        // Update totals based on selected cards
+        // Update totals based on selected cards (excluding purchased)
         function updateTotals(selectedCards) {
             let totalHareruyaJpy = 0;
             let totalHareruyaUsd = 0;
             let totalCkUsd = 0;
             
             selectedCards.forEach(card => {
+                // Skip purchased cards
+                if (cardPurchased[card.name]) {
+                    return;
+                }
+                
                 const hareruyaData = card.hareruya || {};
                 const ckData = card.cardkingdom || {};
                 const qty = card.quantity || 1;
@@ -1623,6 +1693,58 @@
             document.getElementById('hareruyaJpy').textContent = totalHareruyaJpy.toLocaleString();
             document.getElementById('hareruyaUsd').textContent = totalHareruyaUsd.toFixed(2);
             document.getElementById('cardKingdomUsd').textContent = totalCkUsd.toFixed(2);
+        }
+        
+        // Save card states to backend
+        async function saveCardStates() {
+            const saveBtn = document.getElementById('saveChangesBtn');
+            const saveStatus = document.getElementById('saveStatus');
+            
+            try {
+                saveBtn.disabled = true;
+                saveStatus.textContent = 'Saving...';
+                saveStatus.style.color = '#60a5fa';
+                
+                // Build card states array
+                const cardStates = cardsData.map(card => ({
+                    name: card.name,
+                    selected: cardSelections[card.name] !== false,
+                    purchased: cardPurchased[card.name] || false
+                }));
+                
+                // Determine if deck or buylist
+                const isDeck = currentDeckData.source !== 'buylist';
+                const resourceId = isDeck ? currentDeckData.id : currentDeckData.id;
+                const endpoint = isDeck ? 
+                    `${CONFIG.API_BASE_URL}/api/decks/${resourceId}/card-states` :
+                    `${CONFIG.API_BASE_URL}/api/buylists/${resourceId}/card-states`;
+                
+                const response = await fetch(endpoint, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ card_states: cardStates })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save card states');
+                }
+                
+                saveStatus.textContent = '✓ Saved!';
+                saveStatus.style.color = '#4ade80';
+                saveBtn.style.display = 'none';
+                
+                setTimeout(() => {
+                    saveStatus.textContent = '';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                saveStatus.textContent = '✗ Save failed';
+                saveStatus.style.color = '#f87171';
+                saveBtn.disabled = false;
+            }
         }
 
         // Card Modal Functions
