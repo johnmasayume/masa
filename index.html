@@ -908,8 +908,21 @@
                 
                 const data = await response.json();
                 
-                // Update the date in the row
-                const dateCell = row.cells[3];
+                // Update totals
+                const hareruyaCell = row.cells[3];
+                const ckCell = row.cells[4];
+                const dateCell = row.cells[5];
+                const cardsCell = row.cells[2];
+                
+                // Update card count
+                cardsCell.textContent = data.total_cards || 0;
+                
+                // Update prices
+                const totals = data.totals || {};
+                hareruyaCell.textContent = totals.hareruya_jpy ? `¥${totals.hareruya_jpy.toLocaleString()}` : '-';
+                ckCell.textContent = totals.cardkingdom_usd ? `$${totals.cardkingdom_usd.toFixed(2)}` : '-';
+                
+                // Update date
                 const utcString = data.generated_at.endsWith('Z') ? data.generated_at : data.generated_at + 'Z';
                 const newDate = new Date(utcString);
                 const year = newDate.getFullYear();
@@ -919,10 +932,6 @@
                 const minutes = String(newDate.getMinutes()).padStart(2, '0');
                 const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
                 dateCell.textContent = formattedDate;
-                
-                // Update total cards count
-                const cardsCell = row.cells[2];
-                cardsCell.textContent = `${data.total_cards} cards`;
                 
                 // Show success feedback
                 button.innerHTML = '✓ Updated!';
