@@ -55,6 +55,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            table-layout: auto;
         }        
         /* Table container for overflow handling */
         .table-container {
@@ -62,16 +63,30 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-                .buylist-table th {
+        .buylist-table th {
             background: #2a2a2a;
             color: #60a5fa;
             padding: 12px;
             text-align: left;
             font-weight: 600;
+            white-space: nowrap;
         }
         .buylist-table td {
             padding: 12px;
             border-bottom: 1px solid #2a2a2a;
+            vertical-align: middle;
+        }
+        .buylist-table th:nth-child(2),
+        .buylist-table td:nth-child(2),
+        .buylist-table th:nth-child(3),
+        .buylist-table td:nth-child(3) {
+            text-align: center;
+        }
+        .buylist-table th:nth-child(4),
+        .buylist-table td:nth-child(4),
+        .buylist-table th:nth-child(5),
+        .buylist-table td:nth-child(5) {
+            text-align: right;
         }
         .buylist-table tr:hover { background: #1a2f4a; }
         .buylist-link {
@@ -558,9 +573,9 @@
                         return `
                             <tr id="deck-row-${deck.id}">
                                 <td><a href="price.html?deck=${deck.id}" class="buylist-link">${deck.name}</a></td>
-                                <td style="text-align: center;">${cardCount}</td>
-                                <td style="text-align: right; font-weight: 600;">${hareruyaJpy}</td>
-                                <td style="text-align: right; font-weight: 600; color: #60a5fa;">${ckUsd}</td>
+                                <td>${cardCount}</td>
+                                <td>${hareruyaJpy}</td>
+                                <td>${ckUsd}</td>
                                 <td title="${fullDate}">${formattedDate}</td>
                                 <td><span style="color: #3b82f6;">${deck.source?.toUpperCase() || 'MOXFIELD'}</span></td>
                                 <td>
@@ -781,10 +796,10 @@
                         return `
                             <tr id="buylist-row-${buylist.id}">
                                 <td><a href="price.html?buylist=${buylist.id}" class="buylist-link">Buy List #${buylist.id}</a></td>
-                                <td style="text-align: center;">${buylist.deck_count} deck${buylist.deck_count > 1 ? 's' : ''}</td>
-                                <td style="text-align: center;">${buylist.total_cards}</td>
-                                <td style="text-align: right; font-weight: 600;">${hareruyaJpy}</td>
-                                <td style="text-align: right; font-weight: 600; color: #60a5fa;">${ckUsd}</td>
+                                <td>${buylist.deck_count} deck${buylist.deck_count > 1 ? 's' : ''}</td>
+                                <td>${buylist.total_cards}</td>
+                                <td>${hareruyaJpy}</td>
+                                <td>${ckUsd}</td>
                                 <td>${formattedDate}</td>
                                 <td>
                                     <button class="btn-refresh" onclick="refreshBuyList('${buylist.id}')" title="Refresh with latest prices">
