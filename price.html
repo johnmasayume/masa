@@ -2129,7 +2129,12 @@
                 
                 // Determine if deck or buylist
                 const isDeck = currentDeckData.source !== 'buylist';
-                const resourceId = isDeck ? currentDeckData.id : currentDeckData.id;
+                // Extract the actual ID (for buylists, might be in 'id' property or need to extract from 'deckId')
+                let resourceId = currentDeckData.id;
+                if (!resourceId && currentDeckData.deckId) {
+                    // Extract ID from deckId format like "buylist-20260101_121242"
+                    resourceId = currentDeckData.deckId.replace('buylist-', '');
+                }
                 const endpoint = isDeck ? 
                     `${CONFIG.API_BASE_URL}/api/decks/${resourceId}/card-states` :
                     `${CONFIG.API_BASE_URL}/api/buylists/${resourceId}/card-states`;
@@ -2304,6 +2309,7 @@
                     const transformedData = {
                         deckName: `Buy List #${buylistId} (${data.deck_count} Decks)`,
                         deckId: `buylist-${buylistId}`,
+                        id: buylistId,
                         totalCards: data.total_cards,
                         cards: data.consolidated_cards,
                         totals: data.totals,
