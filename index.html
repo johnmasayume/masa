@@ -300,34 +300,41 @@
         @media (max-width: 768px) {
             /* Container and layout */
             .container {
-                padding: 10px;
+                padding: 12px;
             }
             
-            /* Header */
+            /* Base font size for better readability */
+            body {
+                font-size: 16px;
+            }
+            
+            /* Header - larger for mobile */
             .header h1 { 
-                font-size: 1.5em; 
-                margin-bottom: 5px;
+                font-size: 1.8em; 
+                margin-bottom: 8px;
             }
             
             .header p {
-                font-size: 0.9em;
+                font-size: 1em;
             }
             
-            /* Section titles */
+            /* Section titles - larger */
             .section h2 {
-                font-size: 1.3em;
+                font-size: 1.4em;
                 margin-bottom: 15px;
             }
             
-            /* Quick actions button */
+            /* Quick actions button - larger */
             .section a {
-                padding: 12px 30px !important;
-                font-size: 1em !important;
+                padding: 14px 35px !important;
+                font-size: 1.1em !important;
             }
             
-            /* Create buylist button */
+            /* Create buylist button - larger */
             .btn-create-buylist {
-                padding: 10px 20px;
+                padding: 12px 24px;
+                font-size: 1em;
+            }
                 font-size: 0.9em;
             }
             
@@ -340,37 +347,39 @@
                 display: block; /* Ensure block layout */
             }
             
-            /* Tables - make them horizontally scrollable */
+            /* Tables - make them horizontally scrollable with larger text */
             .buylist-table {
-                font-size: 0.8em;
-                min-width: 650px; /* Force horizontal scroll for narrow screens */
+                font-size: 0.95em;
+                min-width: 850px; /* Increased for more columns */
                 width: 100%;
-                display: table; /* Keep table display */
+                display: table;
             }
             
-            /* Table cells */
+            /* Table cells with larger padding and text */
             .buylist-table th,
             .buylist-table td {
-                padding: 6px 4px;
-                font-size: 0.9em;
-                white-space: nowrap; /* Prevent text wrapping */
+                padding: 10px 8px;
+                font-size: 1em;
+                white-space: nowrap;
             }
             
             /* First column can wrap */
             .buylist-table th:first-child,
             .buylist-table td:first-child {
                 white-space: normal;
-                min-width: 100px;
-                max-width: 150px;
+                min-width: 120px;
+                max-width: 180px;
             }
             
-            /* Action buttons */
+            /* Action buttons - larger and more tappable */
             .btn-refresh, 
             .btn-delete,
             .btn-view {
-                padding: 4px 8px;
-                font-size: 0.75em;
-                margin: 2px;
+                padding: 8px 12px;
+                font-size: 0.9em;
+                margin: 3px;
+                min-width: 44px;
+                min-height: 44px;
             }
             
             /* Modal adjustments */
@@ -448,7 +457,10 @@
                         <tr>
                             <th>Buy List</th>
                             <th>Decks</th>
-                            <th>Total Cards</th>
+                            <th>Cards</th>
+                            <th>Hareruya (¥)</th>
+                            <th>Hareruya ($)</th>
+                            <th>Card Kingdom ($)</th>
                             <th>Date Generated</th>
                             <th>Actions</th>
                         </tr>
@@ -467,6 +479,10 @@
                     <thead>
                         <tr>
                             <th>Deck Name</th>
+                            <th>Cards</th>
+                            <th>Hareruya (¥)</th>
+                            <th>Hareruya ($)</th>
+                            <th>Card Kingdom ($)</th>
                             <th>Date Priced</th>
                             <th>Source</th>
                             <th>Actions</th>
@@ -535,9 +551,20 @@
                         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                         const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
                         const fullDate = `${formattedDate} (${timezone})`;
+                        
+                        const totals = deck.totals || {};
+                        const hareruyaJpy = totals.hareruya_jpy ? `¥${totals.hareruya_jpy.toLocaleString()}` : '-';
+                        const hareruyaUsd = totals.hareruya_usd ? `$${totals.hareruya_usd.toFixed(2)}` : '-';
+                        const ckUsd = totals.cardkingdom_usd ? `$${totals.cardkingdom_usd.toFixed(2)}` : '-';
+                        const cardCount = deck.cards?.length || 0;
+                        
                         return `
                             <tr id="deck-row-${deck.id}">
                                 <td><a href="price.html?deck=${deck.id}" class="buylist-link">${deck.name}</a></td>
+                                <td style="text-align: center;">${cardCount}</td>
+                                <td style="text-align: right; font-weight: 600;">${hareruyaJpy}</td>
+                                <td style="text-align: right; font-weight: 600; color: #4ade80;">${hareruyaUsd}</td>
+                                <td style="text-align: right; font-weight: 600; color: #60a5fa;">${ckUsd}</td>
                                 <td title="${fullDate}">${formattedDate}</td>
                                 <td><span style="color: #3b82f6;">${deck.source?.toUpperCase() || 'MOXFIELD'}</span></td>
                                 <td>
@@ -711,11 +738,19 @@
                         const minutes = String(date.getMinutes()).padStart(2, '0');
                         const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
                         
+                        const totals = buylist.totals || {};
+                        const hareruyaJpy = totals.hareruya_jpy ? `¥${totals.hareruya_jpy.toLocaleString()}` : '-';
+                        const hareruyaUsd = totals.hareruya_usd ? `$${totals.hareruya_usd.toFixed(2)}` : '-';
+                        const ckUsd = totals.cardkingdom_usd ? `$${totals.cardkingdom_usd.toFixed(2)}` : '-';
+                        
                         return `
                             <tr id="buylist-row-${buylist.id}">
                                 <td><a href="price.html?buylist=${buylist.id}" class="buylist-link">Buy List #${buylist.id}</a></td>
-                                <td>${buylist.deck_count} deck${buylist.deck_count > 1 ? 's' : ''}</td>
-                                <td>${buylist.total_cards} cards</td>
+                                <td style="text-align: center;">${buylist.deck_count} deck${buylist.deck_count > 1 ? 's' : ''}</td>
+                                <td style="text-align: center;">${buylist.total_cards}</td>
+                                <td style="text-align: right; font-weight: 600;">${hareruyaJpy}</td>
+                                <td style="text-align: right; font-weight: 600; color: #4ade80;">${hareruyaUsd}</td>
+                                <td style="text-align: right; font-weight: 600; color: #60a5fa;">${ckUsd}</td>
                                 <td>${formattedDate}</td>
                                 <td>
                                     <button class="btn-refresh" onclick="refreshBuyList('${buylist.id}')" title="Refresh with latest prices">
