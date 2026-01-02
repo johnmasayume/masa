@@ -769,15 +769,47 @@
             position: absolute;
             top: 8px;
             left: 8px;
-            width: 20px;
-            height: 20px;
             z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            color: #fff;
             cursor: pointer;
+        }
+        .card-grid-checkbox input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+        .card-grid-checkbox:hover {
+            background: rgba(0, 0, 0, 0.9);
         }
         .card-grid-purchased {
             position: absolute;
-            top: 8px;
-            left: 38px;
+            bottom: 8px;
+            left: 8px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(34, 197, 94, 0.85);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            color: #fff;
+            cursor: pointer;
+        }
+        .card-grid-purchased input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+        .card-grid-purchased:hover {
+            background: rgba(34, 197, 94, 1);
             width: 20px;
             height: 20px;
             z-index: 10;
@@ -2024,13 +2056,17 @@
             
             return `
                 <div class="card-grid-item ${colorClass} ${stockClass} ${purchasedClass}">
-                    <div class="card-grid-checkbox">
+                    <div class="card-grid-checkbox" onclick="event.stopPropagation()">
                         <input type="checkbox" ${isSelected ? 'checked' : ''} 
                                onchange="toggleCard('${card.name.replace(/'/g, "\\'")}', this.checked)" 
                                title="Include in purchase">
-                        <input type="checkbox" class="purchased-checkbox" ${isPurchased ? 'checked' : ''} 
+                        <span>Buy</span>
+                    </div>
+                    <div class="card-grid-purchased" onclick="event.stopPropagation()">
+                        <input type="checkbox" ${isPurchased ? 'checked' : ''} 
                                onchange="togglePurchased('${card.name.replace(/'/g, "\\'")}', this.checked)" 
                                title="Mark as purchased">
+                        <span>✓ Bought</span>
                     </div>
                     <div class="card-grid-image" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')">
                         <img src="${imageUrl}" alt="${card.name}" loading="lazy">
