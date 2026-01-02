@@ -765,23 +765,28 @@
             opacity: 0.4;
             filter: grayscale(80%);
         }
+        .card-grid-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px;
+            background: #1f1f1f;
+            border-bottom: 1px solid #333;
+        }
         .card-grid-checkbox {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            z-index: 10;
             display: flex;
             align-items: center;
             gap: 5px;
             background: rgba(59, 130, 246, 0.9);
-            padding: 5px 10px;
+            padding: 6px 10px;
             border-radius: 6px;
             font-size: 0.75em;
             font-weight: 600;
             color: #fff;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            justify-content: center;
         }
         .card-grid-checkbox input {
             cursor: pointer;
@@ -791,25 +796,23 @@
         }
         .card-grid-checkbox:hover {
             background: rgba(59, 130, 246, 1);
-            transform: scale(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
         }
         .card-grid-purchased {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            z-index: 10;
             display: flex;
             align-items: center;
             gap: 5px;
             background: rgba(34, 197, 94, 0.9);
-            padding: 5px 10px;
+            padding: 6px 10px;
             border-radius: 6px;
             font-size: 0.75em;
             font-weight: 600;
             color: #fff;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            justify-content: center;
         }
         .card-grid-purchased input {
             cursor: pointer;
@@ -819,7 +822,8 @@
         }
         .card-grid-purchased:hover {
             background: rgba(34, 197, 94, 1);
-            transform: scale(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
         }
         .card-grid-image {
             width: 100%;
@@ -2062,17 +2066,19 @@
             
             return `
                 <div class="card-grid-item ${colorClass} ${stockClass} ${purchasedClass}">
-                    <div class="card-grid-checkbox" onclick="event.stopPropagation()">
-                        <input type="checkbox" ${isSelected ? 'checked' : ''} 
-                               onchange="toggleCard('${card.name.replace(/'/g, "\\'")}', this.checked)" 
-                               title="Include in purchase">
-                        <span>Buy</span>
-                    </div>
-                    <div class="card-grid-purchased" onclick="event.stopPropagation()">
-                        <input type="checkbox" ${isPurchased ? 'checked' : ''} 
-                               onchange="togglePurchased('${card.name.replace(/'/g, "\\'")}', this.checked)" 
-                               title="Mark as purchased">
-                        <span>✓ Bought</span>
+                    <div class="card-grid-controls">
+                        <div class="card-grid-checkbox" onclick="event.stopPropagation()">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                                   onchange="toggleCard('${card.name.replace(/'/g, "\\'")}', this.checked)" 
+                                   title="Include in purchase">
+                            <span>Buy</span>
+                        </div>
+                        <div class="card-grid-purchased" onclick="event.stopPropagation()">
+                            <input type="checkbox" ${isPurchased ? 'checked' : ''} 
+                                   onchange="togglePurchased('${card.name.replace(/'/g, "\\'")}', this.checked)" 
+                                   title="Mark as purchased">
+                            <span>✓ Bought</span>
+                        </div>
                     </div>
                     <div class="card-grid-image" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')">
                         <img src="${imageUrl}" alt="${card.name}" loading="lazy">
