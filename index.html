@@ -724,7 +724,46 @@
                 if (data.count === 0) {
                     empty.style.display = 'block';
                 } else {
-                    tbody.innerHTML = data.items.map(buylist => {
+                    // Process each buylist and calculate accurate totals
+                    const buylistsWithTotals = await Promise.all(data.items.map(async buylist => {
+                        // Fetch full buylist data to get card states
+                        try {
+                            const detailResponse = await fetch(`${API_BASE_URL}/api/buylists/${buylist.id}`);
+                            if (detailResponse.ok) {
+                                const detailData = await detailResponse.json();
+                                // Calculate totals based on selected and non-purchased cards
+                                let hareruyaJpy = 0;
+                                let ckUsd = 0;
+                                
+                                detailData.consolidated_cards.forEach(card => {
+                                    const isSelected = card.selected !== false;
+                                    const isPurchased = card.purchased || false;
+                                    
+                                    // Only count if selected and not purchased
+                                    if (isSelected && !isPurchased) {
+                                        const qty = card.quantity || 1;
+                                        const hareruyaData = card.hareruya || {};
+                                        const ckData = card.cardkingdom || {};
+                                        
+                                        // Only add if in stock
+                                        if ((hareruyaData.stock || 0) > 0) {
+                                            hareruyaJpy += (hareruyaData.price_jpy || 0) * qty;
+                                        }
+                                        if (ckData.price_usd) {
+                                            ckUsd += ckData.price_usd * qty;
+                                        }
+                                    }
+                                });
+                                
+                                return { ...buylist, calculatedTotals: { hareruya_jpy: hareruyaJpy, cardkingdom_usd: ckUsd } };
+                            }
+                        } catch (err) {
+                            console.error(`Error fetching buylist ${buylist.id}:`, err);
+                        }
+                        return buylist;
+                    }));
+                    
+                    tbody.innerHTML = buylistsWithTotals.map(buylist => {
                         const utcString = buylist.generated_at.endsWith('Z') ? buylist.generated_at : buylist.generated_at + 'Z';
                         const date = new Date(utcString);
                         const year = date.getFullYear();
@@ -734,7 +773,8 @@
                         const minutes = String(date.getMinutes()).padStart(2, '0');
                         const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
                         
-                        const totals = buylist.totals || {};
+                        // Use calculated totals if available, otherwise fall back to stored totals
+                        const totals = buylist.calculatedTotals || buylist.totals || {};
                         const hareruyaJpy = totals.hareruya_jpy ? `¥${totals.hareruya_jpy.toLocaleString()}` : '-';
                         const ckUsd = totals.cardkingdom_usd ? `$${totals.cardkingdom_usd.toFixed(2)}` : '-';
                         
