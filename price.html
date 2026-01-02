@@ -705,6 +705,194 @@
             transform: translateY(-2px);
         }
         
+        /* Grid View Styles */
+        .view-toggle {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .view-btn {
+            background: #2d3748;
+            color: #e0e0e0;
+            border: 2px solid #4a5568;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        .view-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        .view-btn:hover {
+            background: #4a5568;
+        }
+        .view-btn.active:hover {
+            background: #2563eb;
+        }
+        .cards-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .cards-grid.active {
+            display: grid;
+        }
+        .cards-table-container.table-view {
+            display: block;
+        }
+        .cards-table-container.grid-view {
+            display: none;
+        }
+        .card-grid-item {
+            background: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid #333;
+        }
+        .card-grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(59, 130, 246, 0.3);
+        }
+        .card-grid-item.excluded {
+            opacity: 0.4;
+            filter: grayscale(80%);
+        }
+        .card-grid-checkbox {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 20px;
+            height: 20px;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .card-grid-purchased {
+            position: absolute;
+            top: 8px;
+            left: 38px;
+            width: 20px;
+            height: 20px;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .card-grid-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            aspect-ratio: 5/7;
+            object-fit: cover;
+        }
+        .card-grid-info {
+            padding: 12px;
+        }
+        .card-grid-name {
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 2.4em;
+        }
+        .card-grid-qty {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            z-index: 5;
+        }
+        .card-grid-type {
+            font-size: 0.75em;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+        .card-grid-sources {
+            font-size: 0.75em;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        .card-grid-sources strong {
+            color: #d1d5db;
+        }
+        .card-grid-prices {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        .card-grid-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-grid-price-label {
+            font-size: 0.75em;
+            color: #9ca3af;
+        }
+        .card-grid-price-value {
+            font-weight: bold;
+            color: #48bb78;
+        }
+        .card-grid-price-value.not-found {
+            color: #ff6b6b;
+        }
+        .card-grid-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .card-grid-badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: bold;
+            background: #4a5568;
+            color: #e0e0e0;
+        }
+        .card-grid-badge.available {
+            background: #48bb78;
+            color: white;
+        }
+        .card-grid-badge.out-of-stock {
+            background: #f59e0b;
+            color: white;
+        }
+        .card-grid-badge.not-found {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .grid-section-header {
+            grid-column: 1 / -1;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #999;
+            margin: 20px 0 10px 0;
+            padding: 10px;
+            border-bottom: 2px solid #333;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -756,6 +944,21 @@
             
             .filter-group label {
                 font-size: 0.85em;
+            }
+            
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 10px;
+            }
+            .card-grid-info {
+                padding: 8px;
+            }
+            .card-grid-name {
+                font-size: 0.85em;
+            }
+            .view-btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
             }
             
             .filter-group select,
@@ -984,7 +1187,12 @@
             
             <div id="resultsCount" style="color: #b0b0b0; margin-bottom: 10px; display: none;"></div>
             
-            <div class="cards-table-container">
+            <div class="view-toggle" id="viewToggle" style="display: none;">
+                <button class="view-btn active" id="tableViewBtn" onclick="switchCardsView('table')">📋 Table View</button>
+                <button class="view-btn" id="gridViewBtn" onclick="switchCardsView('grid')">🃏 Card View</button>
+            </div>
+            
+            <div class="cards-table-container table-view" id="cardsTableContainer">
                 <table class="cards-table">
                     <thead>
                         <tr>
@@ -1005,6 +1213,11 @@
                     <tbody id="cardsTableBody">
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Grid View Container -->
+            <div class="cards-grid" id="cardsGrid">
+                <!-- Grid items will be populated by JavaScript -->
             </div>
             
             <!-- Buy Later Section -->
@@ -1341,6 +1554,13 @@
             // Show filter controls
             document.getElementById('filterControls').style.display = 'flex';
             
+            // Show view toggle buttons
+            document.getElementById('viewToggle').style.display = 'flex';
+            
+            // Load saved view preference or default to table view
+            const savedView = localStorage.getItem('cardsViewPreference') || 'table';
+            switchCardsView(savedView);
+            
             // Show/hide and populate source filter for buylists
             const deckSourceFilter = document.getElementById('deckSourceFilter');
             if (data.source === 'buylist' && data.metadata && data.metadata.deck_names) {
@@ -1521,6 +1741,9 @@
                 return renderCardRow(card, index, false);
             }).join('');
             
+            // Render grid view
+            renderCardGrid(selectedCards, unselectedCards);
+            
             // Show/hide Buy Later section
             const buyLaterSection = document.getElementById('buyLaterSection');
             if (unselectedCards.length > 0) {
@@ -1693,6 +1916,148 @@
             document.getElementById('hareruyaJpy').textContent = totalHareruyaJpy.toLocaleString();
             document.getElementById('hareruyaUsd').textContent = totalHareruyaUsd.toFixed(2);
             document.getElementById('cardKingdomUsd').textContent = totalCkUsd.toFixed(2);
+        }
+        
+        // Grid View Functions
+        function switchCardsView(viewType) {
+            const tableView = document.getElementById('cardsTableContainer');
+            const gridView = document.getElementById('cardsGrid');
+            const tableBtn = document.getElementById('tableViewBtn');
+            const gridBtn = document.getElementById('gridViewBtn');
+            
+            if (viewType === 'table') {
+                tableView.style.display = 'block';
+                gridView.style.display = 'none';
+                tableBtn.classList.add('active');
+                gridBtn.classList.remove('active');
+            } else {
+                tableView.style.display = 'none';
+                gridView.style.display = 'grid';
+                tableBtn.classList.remove('active');
+                gridBtn.classList.add('active');
+            }
+            
+            // Save preference
+            localStorage.setItem('cardsViewPreference', viewType);
+        }
+        
+        function renderCardGrid(selectedCards, unselectedCards) {
+            const gridContainer = document.getElementById('cardsGrid');
+            const isBuylist = currentDeckData.source === 'buylist';
+            
+            // Build grid HTML for selected cards (Buy Now)
+            let gridHtml = '';
+            if (selectedCards.length > 0) {
+                gridHtml += '<div class="grid-section-header">✓ Buy Now</div>';
+                selectedCards.forEach(card => {
+                    gridHtml += createGridCard(card, true, isBuylist);
+                });
+            }
+            
+            // Build grid HTML for unselected cards (Buy Later)
+            if (unselectedCards.length > 0) {
+                gridHtml += '<div class="grid-section-header">⏳ Buy Later</div>';
+                unselectedCards.forEach(card => {
+                    gridHtml += createGridCard(card, false, isBuylist);
+                });
+            }
+            
+            gridContainer.innerHTML = gridHtml;
+        }
+        
+        function createGridCard(card, isSelected, isBuylist) {
+            const isPurchased = cardPurchased[card.name] || false;
+            const hareruyaData = card.hareruya || {};
+            const ckData = card.cardkingdom || {};
+            
+            const hareruyaJpy = hareruyaData.price_jpy || 0;
+            const hareruyaUsd = hareruyaData.price_usd || 0;
+            const hareruyaStock = hareruyaData.stock || 0;
+            const hareruyaLang = hareruyaData.language || 'N/A';
+            const hareruyaUrl = hareruyaData.url || null;
+            const isFoil = hareruyaData.foil || false;
+            const ckUsd = ckData.price_usd || 0;
+            
+            const isOutOfStock = hareruyaStock === 0;
+            const stockClass = isOutOfStock ? 'out-of-stock' : '';
+            
+            // Get card metadata
+            const imageUrl = card.metadata?.image_uris?.small || card.metadata?.image_uris?.normal || 
+                            (card.metadata?.card_faces?.[0]?.image_uris?.small) || 
+                            'https://via.placeholder.com/200x280?text=No+Image';
+            
+            const manaSymbols = card.metadata?.mana_cost || '';
+            const typeLine = card.metadata?.type_line || 'Unknown Type';
+            const colors = card.metadata?.colors || [];
+            
+            // Color indicator
+            let colorClass = 'colorless';
+            if (colors.length === 0 && manaSymbols.includes('{')) {
+                colorClass = 'colorless';
+            } else if (colors.length > 1) {
+                colorClass = 'multicolor';
+            } else if (colors.length === 1) {
+                colorClass = colors[0].toLowerCase();
+            }
+            
+            // Build sources display (for buylists)
+            let sourcesHtml = '';
+            if (isBuylist && card.sources && Array.isArray(card.sources) && card.sources.length > 0) {
+                sourcesHtml = '<div class="card-grid-sources">';
+                sourcesHtml += '<strong>From:</strong> ';
+                sourcesHtml += card.sources.map(s => `${s.deck_name} (${s.quantity})`).join(', ');
+                sourcesHtml += '</div>';
+            }
+            
+            // Language badge
+            const langClass = hareruyaLang === 'EN' ? 'lang-en' : (hareruyaLang === 'JP' ? 'lang-jp' : 'lang-unknown');
+            const langBadge = hareruyaLang !== 'N/A' ? `<span class="lang-badge ${langClass}">${hareruyaLang}</span>` : '';
+            const foilBadge = isFoil ? '<span class="foil-badge">✨ FOIL</span>' : '';
+            
+            // Make prices clickable
+            const jpyPrice = hareruyaJpy ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener">¥${hareruyaJpy}</a>` : `¥${hareruyaJpy}`) : '-';
+            const usdPrice = hareruyaUsd ? (hareruyaUrl ? `<a href="${hareruyaUrl}" target="_blank" rel="noopener">$${hareruyaUsd.toFixed(2)}</a>` : `$${hareruyaUsd.toFixed(2)}`) : '-';
+            
+            const purchasedClass = isPurchased ? 'purchased' : '';
+            
+            return `
+                <div class="card-grid-item ${colorClass} ${stockClass} ${purchasedClass}">
+                    <div class="card-grid-checkbox">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                               onchange="toggleCard('${card.name.replace(/'/g, "\\'")}', this.checked)" 
+                               title="Include in purchase">
+                        <input type="checkbox" class="purchased-checkbox" ${isPurchased ? 'checked' : ''} 
+                               onchange="togglePurchased('${card.name.replace(/'/g, "\\'")}', this.checked)" 
+                               title="Mark as purchased">
+                    </div>
+                    <div class="card-grid-image" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')">
+                        <img src="${imageUrl}" alt="${card.name}" loading="lazy">
+                        ${card.quantity > 1 ? `<div class="card-grid-qty">${card.quantity}x</div>` : ''}
+                    </div>
+                    <div class="card-grid-info">
+                        <div class="card-grid-name" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')">${card.name}</div>
+                        <div class="card-grid-type">${typeLine}</div>
+                        ${sourcesHtml}
+                        <div class="card-grid-prices">
+                            <div class="price-row">
+                                <span class="price-label">Hareruya:</span>
+                                <span class="price-value">${jpyPrice} / ${usdPrice}</span>
+                            </div>
+                            ${ckUsd ? `
+                            <div class="price-row">
+                                <span class="price-label">CK:</span>
+                                <span class="price-value">$${ckUsd.toFixed(2)}</span>
+                            </div>
+                            ` : ''}
+                            <div class="card-grid-badges">
+                                ${langBadge}
+                                ${foilBadge}
+                                ${hareruyaStock > 0 ? '<span class="stock-badge available">✓ In Stock</span>' : '<span class="stock-badge unavailable">✗ Out of Stock</span>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
         
         // Save card states to backend
