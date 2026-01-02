@@ -556,7 +556,7 @@
                         const hareruyaJpy = totals.hareruya_jpy ? `¥${totals.hareruya_jpy.toLocaleString()}` : '-';
                         const hareruyaUsd = totals.hareruya_usd ? `$${totals.hareruya_usd.toFixed(2)}` : '-';
                         const ckUsd = totals.cardkingdom_usd ? `$${totals.cardkingdom_usd.toFixed(2)}` : '-';
-                        const cardCount = deck.cards?.length || 0;
+                        const cardCount = deck.card_count || 0;
                         
                         return `
                             <tr id="deck-row-${deck.id}">
