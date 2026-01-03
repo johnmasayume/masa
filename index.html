@@ -628,7 +628,8 @@
                 const data = await response.json();
                 
                 // Update the date in the row
-                const dateCell = row.cells[1];
+                // Column indexes: 0=name, 1=cards, 2=hareruya, 3=ck, 4=date, 5=source, 6=actions
+                const dateCell = row.cells[4];
                 // Backend sends UTC time without 'Z', so append it for proper parsing
                 const utcString = data.generated_at.endsWith('Z') ? data.generated_at : data.generated_at + 'Z';
                 const newDate = new Date(utcString);
