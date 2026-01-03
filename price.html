@@ -302,6 +302,31 @@
             background: #4a1f1f;
             color: #ff6b6b;
         }
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+        }
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+        .add-to-cart-btn:disabled {
+            background: #4a4a4a;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
         .lang-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -2169,6 +2194,13 @@
                                 ${foilBadge}
                                 ${hareruyaStock > 0 ? '<span class="stock-badge available">✓ In Stock</span>' : '<span class="stock-badge unavailable">✗ Out of Stock</span>'}
                             </div>
+                            ${hareruyaData.product_class_id && hareruyaStock > 0 ? `
+                            <div class="card-grid-cart" style="margin-top: 8px;">
+                                <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToHareruyaCart('${hareruyaData.product_class_id}', ${card.quantity})">
+                                    🛒 Add to Hareruya Cart
+                                </button>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
@@ -2230,6 +2262,40 @@
                 saveStatus.textContent = '✗ Save failed';
                 saveStatus.style.color = '#f87171';
                 saveBtn.disabled = false;
+            }
+        }
+
+        // Add card to Hareruya cart
+        async function addToHareruyaCart(productClassId, quantity = 1) {
+            try {
+                // Create a form and submit it to Hareruya
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://www.hareruyamtg.com/en/cart/add';
+                form.target = '_blank';
+                
+                // Add product_class_id field
+                const productField = document.createElement('input');
+                productField.type = 'hidden';
+                productField.name = 'product_class_id';
+                productField.value = productClassId;
+                form.appendChild(productField);
+                
+                // Add quantity field
+                const quantityField = document.createElement('input');
+                quantityField.type = 'hidden';
+                quantityField.name = 'quantity';
+                quantityField.value = quantity;
+                form.appendChild(quantityField);
+                
+                // Submit the form
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+                
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Failed to add item to cart. Please try again.');
             }
         }
 
