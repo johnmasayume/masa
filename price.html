@@ -2102,6 +2102,11 @@
             const hareruyaData = card.hareruya || {};
             const ckData = card.cardkingdom || {};
             
+            // Debug: Log if product_class_id is missing for in-stock items
+            if (hareruyaData.stock > 0 && !hareruyaData.product_class_id) {
+                console.warn(`Card "${card.name}" is in stock but missing product_class_id. Refresh deck to get add-to-cart feature.`);
+            }
+            
             const hareruyaJpy = hareruyaData.price_jpy || 0;
             const hareruyaUsd = hareruyaData.price_usd || 0;
             const hareruyaStock = hareruyaData.stock || 0;
