@@ -327,6 +327,30 @@
             cursor: not-allowed;
             opacity: 0.5;
         }
+        .table-cart-btn {
+            padding: 6px 10px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 36px;
+        }
+        .table-cart-btn:hover {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(245, 158, 11, 0.3);
+        }
+        .table-cart-btn:active {
+            transform: translateY(0);
+        }
+        .table-cart-btn:disabled {
+            background: #4a4a4a;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
         .lang-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -1299,6 +1323,7 @@
                             <th>Hareruya ($)</th>
                             <th>Card Kingdom ($)</th>
                             <th>Availability</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="cardsTableBody">
@@ -1931,6 +1956,13 @@
                         </td>
                         <td>${ckUsd ? '$' + ckUsd.toFixed(2) : '-'}</td>
                         <td>${stockStatus}</td>
+                        <td style="text-align: center;">
+                            ${hareruyaData.product_class_id && hareruyaStock > 0 ? `
+                                <button class="table-cart-btn" onclick="event.stopPropagation(); addToHareruyaCart('${hareruyaData.product_class_id}', ${card.quantity})" title="Add to Hareruya cart">
+                                    🛒
+                                </button>
+                            ` : '-'}
+                        </td>
                     </tr>
                 `;
         }
