@@ -1314,14 +1314,14 @@
                             <th style="width: 40px;"><input type="checkbox" id="selectAllCards" checked onchange="toggleAllCards(this.checked)" title="Select/Unselect All"></th>
                             <th style="width: 60px;">Purchased</th>
                             <th>Card</th>
+                            <th>Hareruya (¥)</th>
+                            <th>Hareruya ($)</th>
+                            <th>Card Kingdom ($)</th>
                             <th>Type</th>
                             <th>Mana Cost</th>
                             <th>Qty</th>
                             <th class="sources-column">Sources</th>
                             <th>Lang</th>
-                            <th>Hareruya (¥)</th>
-                            <th>Hareruya ($)</th>
-                            <th>Card Kingdom ($)</th>
                             <th>Availability</th>
                             <th>Actions</th>
                         </tr>
@@ -1941,13 +1941,6 @@
                                 <span class="card-name" onclick="showCardModal('${card.name.replace(/'/g, "\\'")}')" title="Click for details">${card.name}</span>
                             </div>
                         </td>
-                        <td>
-                            <span class="type-badge type-${typeClass}">${primaryType}</span>
-                        </td>
-                        <td>${renderManaCost(card.metadata.mana_cost)}</td>
-                        <td>${card.quantity}</td>
-                        <td class="sources-column" style="font-size: 0.85em; line-height: 1.4;">${sourcesContent}</td>
-                        <td>${langBadge}${foilBadge}</td>
                         <td${isOutOfStock ? ' class="out-of-stock"' : ''}>
                             ${jpyPrice}
                         </td>
@@ -1955,6 +1948,13 @@
                             ${usdPrice}
                         </td>
                         <td>${ckUsd ? '$' + ckUsd.toFixed(2) : '-'}</td>
+                        <td>
+                            <span class="type-badge type-${typeClass}">${primaryType}</span>
+                        </td>
+                        <td>${renderManaCost(card.metadata.mana_cost)}</td>
+                        <td>${card.quantity}</td>
+                        <td class="sources-column" style="font-size: 0.85em; line-height: 1.4;">${sourcesContent}</td>
+                        <td>${langBadge}${foilBadge}</td>
                         <td>${stockStatus}</td>
                         <td style="text-align: center;">
                             ${hareruyaData.product_class_id && hareruyaStock > 0 ? `
