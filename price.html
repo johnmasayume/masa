@@ -1915,7 +1915,9 @@
             cardSelections[cardName] = isChecked;
             renderCards();
             // Show save button when changes are made
-            document.getElementById('saveChangesBtn').style.display = 'inline-block';
+            const saveBtn = document.getElementById('saveChangesBtn');
+            saveBtn.style.display = 'inline-block';
+            saveBtn.disabled = false;
         }
         
         // Toggle card purchased state
@@ -1923,7 +1925,9 @@
             cardPurchased[cardName] = isChecked;
             renderCards();
             // Show save button when changes are made
-            document.getElementById('saveChangesBtn').style.display = 'inline-block';
+            const saveBtn = document.getElementById('saveChangesBtn');
+            saveBtn.style.display = 'inline-block';
+            saveBtn.disabled = false;
         }
         
         // Toggle all cards in main table
@@ -2215,6 +2219,7 @@
                 saveStatus.textContent = '✓ Saved!';
                 saveStatus.style.color = '#4ade80';
                 saveBtn.style.display = 'none';
+                saveBtn.disabled = false; // Reset disabled state for next save
                 
                 setTimeout(() => {
                     saveStatus.textContent = '';
