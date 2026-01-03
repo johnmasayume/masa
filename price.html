@@ -1168,6 +1168,21 @@
                 </div>
             </div>
             
+            <!-- Stock Status Stats -->
+            <div class="stock-stats" id="stockStats" style="display: none; margin: 15px 0; padding: 15px; background: #2a2a2a; border-radius: 8px;">
+                <h3 style="font-size: 1em; margin-bottom: 10px; color: #60a5fa;">📊 Stock Status</h3>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div>
+                        <span style="color: #9ca3af;">In Stock:</span>
+                        <strong style="color: #4ade80;"><span id="inStockCount">0</span></strong>
+                    </div>
+                    <div style="cursor: pointer;" onclick="showOutOfStockCards()" title="Click to see which cards are out of stock">
+                        <span style="color: #9ca3af;">Out of Stock:</span>
+                        <strong style="color: #f59e0b; text-decoration: underline;"><span id="outOfStockCount">0</span></strong>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Save Changes Button -->
             <div style="text-align: center; margin: 20px 0;">
                 <button id="saveChangesBtn" class="save-changes-btn" onclick="saveCardStates()" style="display: none;">
@@ -1934,10 +1949,15 @@
         }
         
         // Update totals based on selected cards (excluding purchased)
+        let outOfStockCards = []; // Track out of stock cards globally
+        
         function updateTotals(selectedCards) {
             let totalHareruyaJpy = 0;
             let totalHareruyaUsd = 0;
             let totalCkUsd = 0;
+            let inStockCount = 0;
+            let outOfStockCount = 0;
+            outOfStockCards = []; // Reset
             
             selectedCards.forEach(card => {
                 // Skip purchased cards
@@ -1953,20 +1973,52 @@
                 const hareruyaUsd = hareruyaData.price_usd || 0;
                 const ckUsd = ckData.price_usd || 0;
                 
-                // Only add if in stock
+                // Check stock status
                 if ((hareruyaData.stock || 0) > 0) {
+                    inStockCount += qty;
                     totalHareruyaJpy += hareruyaJpy * qty;
                     totalHareruyaUsd += hareruyaUsd * qty;
+                } else {
+                    outOfStockCount += qty;
+                    outOfStockCards.push({
+                        name: card.name,
+                        quantity: qty,
+                        price_jpy: hareruyaJpy,
+                        url: hareruyaData.product_url || hareruyaData.url
+                    });
                 }
+                
                 if (ckUsd > 0) {
                     totalCkUsd += ckUsd * qty;
                 }
             });
             
-            // Update display
+            // Update price display
             document.getElementById('hareruyaJpy').textContent = totalHareruyaJpy.toLocaleString();
             document.getElementById('hareruyaUsd').textContent = totalHareruyaUsd.toFixed(2);
             document.getElementById('cardKingdomUsd').textContent = totalCkUsd.toFixed(2);
+            
+            // Update stock stats
+            document.getElementById('inStockCount').textContent = inStockCount;
+            document.getElementById('outOfStockCount').textContent = outOfStockCount;
+            document.getElementById('stockStats').style.display = 'block';
+        }
+        
+        // Show out of stock cards modal/alert
+        function showOutOfStockCards() {
+            if (outOfStockCards.length === 0) {
+                alert('All selected cards are in stock! 🎉');
+                return;
+            }
+            
+            let message = `Out of Stock Cards (${outOfStockCards.length}):\n\n`;
+            outOfStockCards.forEach(card => {
+                const qtyStr = card.quantity > 1 ? `${card.quantity}x ` : '';
+                const priceStr = card.price_jpy ? ` - ¥${card.price_jpy}` : '';
+                message += `${qtyStr}${card.name}${priceStr}\n`;
+            });
+            
+            alert(message);
         }
         
         // Grid View Functions
